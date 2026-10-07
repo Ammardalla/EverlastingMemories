@@ -15,13 +15,21 @@
   --color-taupe: #A89584;
   --color-white: #FAF7F2;
 }
+
+body{
+    background-color: var(--color-black);
+}
 /*for the header and navBar*/
 header{
+    position: sticky;
+    top: 0;
     width: 100vw;
     display: flex;
+    gap: 6rem;
     justify-content: space-evenly;
-    position: sticky;
-    background-color: rgb(from var(--color-black) r g b / 90%);
+    align-items: center;
+    background-color: rgb(from var(--color-black) r g b / 80%);
+    z-index: 10;
 }
 
 a{
@@ -30,9 +38,9 @@ a{
 
 .logo{
     color: var(--color-gold);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    margin: 2rem;
+    margin: 1rem;
 }
 
 .logo span{
@@ -58,4 +66,214 @@ li a{
     color: var(--color-cream);
 }
 
+li a:hover{
+    color: var(--color-orange);
+}
+/*Css rules for hero section*/
+.hero{
+    position: relative;
+    background-color: var(--color-espresso);
+        overflow: hidden;
 
+}
+
+#eyebrow {
+    padding-top: 2rem;
+    margin: 1rem;
+    color: var(--color-gold);
+    font-weight: 400;
+}
+
+.hero h1 {
+    margin-top: 2rem;
+    margin-left: 1rem;
+        letter-spacing: 0.1em;
+    font-size: 2.8rem;
+    color: var(--color-white);
+}
+
+.hero h1 span {
+    color: var(--color-gold);
+}
+
+.subtext {
+    margin-left: 1rem;
+  color: var(--color-taupe);
+}
+
+.btn {
+    margin: 3rem 2rem 2rem 1rem;
+    position: relative;
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    background-color: var(--color-orange);
+    color: var(--color-white);
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    border: 1px solid var(--color-orange);
+    border-radius: 25px;
+    overflow: hidden;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.25),
+        transparent
+  );
+
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+    }
+
+.btn:hover::before {
+    left: 150%;
+}
+
+.btn:hover {
+    background-color: var(--color-gold);
+    border-color: var(--color-gold);
+    color: var(--color-black);
+    transform: translateY(-3px);
+    box-shadow:
+        0 10px 25px rgba(212, 168, 90, 0.2);
+}
+
+
+/*Css riles for gallery section*/
+.gallery {
+    padding: 6rem 5%;
+    background-color: var(--color-cream);
+    color: var(--color-black);
+}
+
+.gallery-heading {
+    max-width: 650px;
+    margin-bottom: 3rem;
+}
+
+.gallery-heading .eyebrow {
+    color: var(--color-orange);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.gallery-heading h2 {
+    margin: 0.5rem 0 1rem;
+    font-size: 2.6rem;
+}
+
+.gallery-heading h2 span {
+    color: var(--color-terracotta);
+}
+
+.gallery-heading > p:last-child {
+    max-width: 60vw;
+    color: var(--color-taupe);
+    line-height: 1.7;
+}
+
+.gallery-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    grid-auto-rows: 220px;
+
+    gap: 1rem;
+}
+.gallery-item {
+    position: relative;
+
+    margin: 0;
+
+    background-color: var(--color-espresso);
+}
+
+.gallery-item.large {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.gallery-item.tall {
+    grid-row: span 2;
+}
+
+.gallery-item.wid {
+    grid-column: span 2;
+}
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+    object-fit: cover;
+
+    transition: transform 0.6s ease;
+}
+.gallery-item::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        to top,
+        rgba(21, 21, 21, 0.75),
+        transparent 55%
+    );
+
+    opacity: 0;
+
+    transition: opacity 0.4s ease;
+}
+
+.gallery-item:hover::after {
+    opacity: 1;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+.gallery-item figcaption {
+    position: absolute;
+
+    left: 1.2rem;
+    bottom: 1.2rem;
+
+    z-index: 2;
+
+    color: var(--color-white);
+
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+
+    opacity: 0;
+
+    transform: translateY(10px);
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+
+.gallery-item:hover figcaption {
+    opacity: 1;
+    transform: translateY(0);
+}
