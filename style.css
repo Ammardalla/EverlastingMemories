@@ -1,0 +1,61 @@
+/*Mobile first */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  --color-black: #151515;
+  --color-espresso: #3B2923;
+  --color-orange: #C66A3D;
+  --color-gold: #D4A85A;
+  --color-terracotta: #B85C4A;
+  --color-cream: #F5EBDD;
+  --color-taupe: #A89584;
+  --color-white: #FAF7F2;
+}
+/*for the header and navBar*/
+header{
+    width: 100vw;
+    display: flex;
+    justify-content: space-evenly;
+    position: sticky;
+    background-color: rgb(from var(--color-black) r g b / 90%);
+}
+
+a{
+    text-decoration: none;
+}
+
+.logo{
+    color: var(--color-gold);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 2rem;
+}
+
+.logo span{
+    color: var(--color-orange);
+    display: inline-block;
+    transition: transform  1s ease-in;
+}
+
+.logo span:hover{
+    transform :rotate(360deg);
+}
+
+.nav-link{
+    width: 50vw;
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+    gap: .2rem;
+    margin: 2rem;
+}
+
+li a{
+    color: var(--color-cream);
+}
+
+
