@@ -10,12 +10,29 @@
 <body>
     <header>
         <a href="a" class="logo">Everlasting <span>Memories</span></a>
-        <ul class="nav-link">
-            <li><a href="#hero">Home</a></li>
-            <li><a href="#gallery">Gallery</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
+        <nav class="navbar" aria-label="Main navigation">
+
+            <button
+                class="menu-toggle"
+                id="menu-toggle"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="nav-links"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="nav-link" id="nav-links">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+
+        </nav>
     </header>    
 
     <main>
@@ -24,12 +41,118 @@
                 <p id="eyebrow">YOUR MOMENTS. YOUR STORY.</p>
                 <h1>Turn Moments Into <span>Memories</span></h1>
                 <p class="subtext">We capture the emotions, details, and moments that deserve to last forever.</p>
-                <a href="#" class="btn">Capture Your Moment</a>
+                <button type="button" class="btn" id="open-booking">Capture Your Moment</button>
             </div>
             <div id="img-sec">
                 <img src="/images/Gemini.jpg" alt="" id="hero-img">
             </div>
         </section>
+<dialog class="booking-modal" id="booking-modal"
+        aria-labelledby="booking-title">
+
+    <div class="booking-header">
+        <div>
+            <p class="eyebrow">LET'S CREATE SOMETHING TIMELESS</p>
+            <h2 id="booking-title">
+                Book Your <span>Session.</span>
+            </h2>
+            <p class="booking-intro">
+                Tell us about your plans, and let's make
+                something worth remembering.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            class="modal-close"
+            id="close-booking"
+            aria-label="Close booking form"
+            autofocus
+        >
+            &times;
+        </button>
+    </div>
+
+    <form class="booking-form" id="booking-form">
+
+        <div class="booking-fields">
+
+            <div class="form-group">
+                <label for="booking-name">Full Name <span>*</span></label>
+                <input
+                    type="text"
+                    id="booking-name"
+                    name="name"
+                    autocomplete="name"
+                    placeholder="Your full name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="booking-email">Email Address <span>*</span></label>
+                <input
+                    type="email"
+                    id="booking-email"
+                    name="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="booking-service">Photography Type <span>*</span></label>
+                <select id="booking-service" name="service" required>
+                    <option value="" disabled selected>Select a session</option>
+                    <option value="portrait">Portraits</option>
+                    <option value="couples">Couples</option>
+                    <option value="wedding">Weddings</option>
+                    <option value="editorial">Editorial</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="booking-date">Preferred Date <span>*</span></label>
+                <input
+                    type="date"
+                    id="booking-date"
+                    name="date"
+                    required
+                >
+            </div>
+
+            <div class="form-group form-group-full">
+                <label for="booking-message">Your Vision <span class="optional">(Optional)</span></label>
+                <textarea
+                    id="booking-message"
+                    name="message"
+                    rows="3"
+                    placeholder="Tell us a little about the session you have in mind..."
+                ></textarea>
+            </div>
+
+        </div>
+
+        <p class="booking-note">
+            * Required fields
+        </p>
+
+        <p class="booking-status" id="booking-status" role="status" aria-live="polite"></p>
+
+        <div class="booking-actions">
+            <button type="button" class="cancel-btn" id="cancel-booking">
+                Cancel
+            </button>
+
+            <button type="submit" class="submit-booking">
+                Book Session <span aria-hidden="true">→</span>
+            </button>
+        </div>
+
+    </form>
+
+</dialog>
         <section id="gallery" class="gallery">
 
             <div class="gallery-heading">
@@ -47,12 +170,12 @@
                     <figcaption>Portraits</figcaption>
                 </figure>
 
-                <figure class="gallery-item">
+                <figure class="gallery-item small">
                     <img src="images/img2.jpg" alt="Couple photography">
                     <figcaption>Couples</figcaption>
                 </figure>
 
-                <figure class="gallery-item">
+                <figure class="gallery-item small">
                     <img src="images/img3.jpg" alt="Wedding photography">
                     <figcaption>Weddings</figcaption>
                 </figure>
@@ -62,17 +185,17 @@
                     <figcaption>Editorial</figcaption>
                 </figure>
 
-                <figure class="gallery-item">
+                <figure class="gallery-item small">
                     <img src="images/img5.jpg" alt="Portrait photography">
                     <figcaption>Portraits</figcaption>
                 </figure>
 
-                <figure class="gallery-item large">
+                <figure class="gallery-item large lrsm">
                     <img src="images/img6.webp" alt="Wedding photography">
                     <figcaption>Weddings</figcaption>
                 </figure>
 
-                <figure class="gallery-item">
+                <figure class="gallery-item small smla">
                     <img src="images/img7.jpg" alt="Couple photography">
                     <figcaption>Couples</figcaption>
                 </figure>
@@ -86,11 +209,6 @@
 
         </section>
         <section id="about" class="about">
-            <div class="about-image">
-                <img src="/images/studio.jpg" alt="Photographer capturing a meaningful moment">
-                <span class="about-image-label">CAPTURING MOMENTS</span>
-            </div>
-
             <div class="about-content">
 
                 <p class="eyebrow">ABOUT US</p>
@@ -132,6 +250,10 @@
                         <p>Images made to stay with you forever.</p>
                     </div>
                 </div>
+            </div>
+            <div class="about-image">
+                <img src="/images/studio.jpg" alt="Photographer capturing a meaningful moment">
+                <span class="about-image-label">CAPTURING MOMENTS</span>
             </div>
         </section>
         <section id="contact" class="contact">
@@ -188,8 +310,10 @@
             </div>
             <div class="footer-social">
                 <p class="footer-label">FOLLOW</p>
-                <a href="#">Instagram</a>
-                <a href="#">Facebook</a>
+                <div class="social">
+                    <a href="#">Instagram</a>
+                    <a href="#">Facebook</a>
+                </div>
             </div>
             <div class="footer-message">
                 <span>CAPTURED WITH INTENTION</span>
@@ -202,5 +326,98 @@
         </div>
     </footer>
 
+
+<script>
+
+const menuToggle = document.querySelector("#menu-toggle");
+const navLinks = document.querySelector("#nav-links");
+const navItems = navLinks.querySelectorAll("a");
+
+function closeMenu() {
+    navLinks.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.setAttribute("aria-label", "Open navigation menu");
+}
+
+menuToggle.addEventListener("click", () => {
+    const isExpanded =
+        menuToggle.getAttribute("aria-expanded") === "true";
+
+    if (isExpanded) {
+        closeMenu();
+    } else {
+        navLinks.classList.add("is-open");
+        menuToggle.setAttribute("aria-expanded", "true");
+        menuToggle.setAttribute("aria-label", "Close navigation menu");
+    }
+});
+
+// Close menu after choosing a section
+navItems.forEach((item) => {
+    item.addEventListener("click", closeMenu);
+});
+
+// Close menu when pressing Escape
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        closeMenu();
+        menuToggle.focus();
+    }
+});
+
+// Close the mobile menu when clicking outside it
+document.addEventListener("click", (event) => {
+    const clickedInsideMenu =
+        navLinks.contains(event.target) ||
+        menuToggle.contains(event.target);
+
+    if (!clickedInsideMenu) {
+        closeMenu();
+    }
+});
+
+// Reset menu when switching to desktop layout
+window.addEventListener("resize", () => {
+    if (window.innerWidth >= 900) {
+        closeMenu();
+    }
+});
+
+const bookingModal = document.querySelector("#booking-modal");
+const openBooking = document.querySelector("#open-booking");
+const closeBooking = document.querySelector("#close-booking");
+const cancelBooking = document.querySelector("#cancel-booking");
+const bookingForm = document.querySelector("#booking-form");
+const bookingStatus = document.querySelector("#booking-status");
+
+// Open the booking modal
+openBooking.addEventListener("click", () => {
+    bookingModal.showModal();
+});
+
+// Close the modal
+closeBooking.addEventListener("click", () => {
+    bookingModal.close();
+});
+
+cancelBooking.addEventListener("click", () => {
+    bookingModal.close();
+});
+
+// Close when clicking the backdrop
+bookingModal.addEventListener("click", (event) => {
+    if (event.target === bookingModal) {
+        bookingModal.close();
+    }
+});
+
+// Demo submission — no real booking is sent
+bookingForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    bookingStatus.textContent =
+        "The form is valid, but booking is not connected to a server yet.";
+});
+</script>
 </body>
 </html>
