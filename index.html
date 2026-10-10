@@ -53,124 +53,69 @@
                 <img src="images/Gemini.jpg" alt="Photography portfolio studio image" id="hero-img">
             </div>
         </section>
-<dialog class="booking-modal" id="booking-modal"
-        aria-labelledby="booking-title">
+        <dialog class="booking-modal" id="booking-modal" aria-labelledby="booking-title">
+            <div class="booking-header">
+                <div>
+                    <p class="eyebrow">LET'S CREATE SOMETHING TIMELESS</p>
+                    <h2 id="booking-title">Book Your <span>Session.</span></h2>
+                    <p class="booking-intro">
+                        Tell us about your plans, and let's make
+                        something worth remembering.
+                    </p>
+                </div>
 
-    <div class="booking-header">
-        <div>
-            <p class="eyebrow">LET'S CREATE SOMETHING TIMELESS</p>
-            <h2 id="booking-title">
-                Book Your <span>Session.</span>
-            </h2>
-            <p class="booking-intro">
-                Tell us about your plans, and let's make
-                something worth remembering.
-            </p>
-        </div>
-
-        <button
-            type="button"
-            class="modal-close"
-            id="close-booking"
-            aria-label="Close booking form"
-            autofocus
-        >
-            &times;
-        </button>
-    </div>
-
-    <form class="booking-form" id="booking-form">
-
-        <div class="booking-fields">
-
-            <div class="form-group">
-                <label for="booking-name">Full Name <span>*</span></label>
-                <input
-                    type="text"
-                    id="booking-name"
-                    name="name"
-                    autocomplete="name"
-                    placeholder="Your full name"
-                    required
-                >
+                <button type="button" class="modal-close" id="close-booking" aria-label="Close booking form" autofocus>&times;</button>
             </div>
 
-            <div class="form-group">
-                <label for="booking-email">Email Address <span>*</span></label>
-                <input
-                    type="email"
-                    id="booking-email"
-                    name="email"
-                    autocomplete="email"
-                    placeholder="you@example.com"
-                    required
-                >
-            </div>
+            <form class="booking-form" id="booking-form">
+                <div class="booking-fields">
+                    <div class="form-group">
+                        <label for="booking-name">Full Name <span>*</span></label>
+                        <input type="text" id="booking-name" name="name" autocomplete="name" placeholder="Your full name" required>
+                    </div>
 
-            <div class="form-group">
-                <label for="booking-service">Photography Type <span>*</span></label>
-                <select id="booking-service" name="service" required>
-                    <option value="" disabled selected>Select a session</option>
-                    <option value="portrait">Portraits</option>
-                    <option value="couples">Couples</option>
-                    <option value="wedding">Weddings</option>
-                    <option value="editorial">Editorial</option>
-                </select>
-            </div>
+                    <div class="form-group">
+                        <label for="booking-email">Email Address <span>*</span></label>
+                        <input type="email" id="booking-email" name="email" autocomplete="email" placeholder="you@example.com" required>
+                    </div>
 
-            <div class="form-group">
-                <label for="booking-date">Preferred Date <span>*</span></label>
-                <input
-                    type="date"
-                    id="booking-date"
-                    name="date"
-                    required
-                >
-            </div>
+                    <div class="form-group">
+                        <label for="booking-service">Photography Type <span>*</span></label>
+                        <select id="booking-service" name="service" required>
+                            <option value="" disabled selected>Select a session</option>
+                            <option value="portrait">Portraits</option>
+                            <option value="couples">Couples</option>
+                            <option value="wedding">Weddings</option>
+                            <option value="editorial">Editorial</option>
+                        </select>
+                    </div>
 
-            <div class="form-group form-group-full">
-                <label for="booking-message">Your Vision <span class="optional">(Optional)</span></label>
-                <textarea
-                    id="booking-message"
-                    name="message"
-                    rows="3"
-                    placeholder="Tell us a little about the session you have in mind..."
-                ></textarea>
-            </div>
+                    <div class="form-group">
+                        <label for="booking-date">Preferred Date <span>*</span></label>
+                        <input type="date" id="booking-date" name="date" required>
+                    </div>
 
-        </div>
-
-        <p class="booking-note">
-            * Required fields
-        </p>
-
-        <p class="booking-status" id="booking-status" role="status" aria-live="polite"></p>
-
-        <div class="booking-actions">
-            <button type="button" class="cancel-btn" id="cancel-booking">
-                Cancel
-            </button>
-
-            <button type="submit" class="submit-booking">
-                Book Session <span aria-hidden="true">→</span>
-            </button>
-        </div>
-
-    </form>
-
-</dialog>
+                    <div class="form-group form-group-full">
+                        <label for="booking-message">Your Vision <span class="optional">(Optional)</span></label>
+                        <textarea id="booking-message" name="message" rows="3" placeholder="Tell us a little about the session you have in mind..."></textarea>
+                    </div>
+                </div>
+                <p class="booking-note">* Required fields</p>
+                <p class="booking-status" id="booking-status" role="status" aria-live="polite"></p>
+                <div class="booking-actions">
+                    <button type="button" class="cancel-btn" id="cancel-booking">Cancel</button>
+                    <button type="submit" class="submit-booking">Book Session <span aria-hidden="true">→</span></button>
+                </div>
+            </form>
+        </dialog>
         <section id="gallery" class="gallery">
-
             <div class="gallery-heading">
                 <p class="eyebrow">OUR WORK</p>
                 <h2>Moments Worth <span>Remembering</span></h2>
-                <p>
-                    A collection of stories, emotions, and moments captured to last forever.
-                </p>
+                <p>A collection of stories, emotions, and moments captured to last forever.</p>
             </div>
 
             <div class="gallery-grid">
-
                 <figure class="gallery-item large">
                     <img src="images/img1.jpg" alt="Portrait photography">
                     <figcaption>Portraits</figcaption>
@@ -216,28 +161,16 @@
         </section>
         <section id="about" class="about">
             <div class="about-content">
-
                 <p class="eyebrow">ABOUT US</p>
-
-                <h2>
-                    More Than a
-                    <span>Photograph.</span>
-                </h2>
-
-                <p class="about-intro">
-                    We believe the most meaningful photographs are the ones
-                    that make you feel something.
-                </p>
-
+                <h2>More Than a<span>Photograph.</span></h2>
+                <p class="about-intro">We believe the most meaningful photographs are the ones that make you feel something.</p>
                 <p class="about-text">
                     Everlasting Memories was created to capture genuine emotions,
                     beautiful details, and unforgettable moments. From intimate
                     portraits to once-in-a-lifetime celebrations, we turn real
                     moments into photographs that remain timeless.
                 </p>
-
                 <div class="about-values">
-
                     <div class="about-value">
                         <span>01</span>
                         <h3>Emotion</h3>
