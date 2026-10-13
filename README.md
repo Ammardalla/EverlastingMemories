@@ -1,9 +1,16 @@
-everlasting Photography
-A modern and responsive photography website for Everlasting, designed to showcase photography sessions and event photography services.
+# React + Vite
 
-About the Project
-This project was created as a professional website for Everlasting Photography, providing visitors with an easy way to explore photography services, view the website on different devices, and get in touch or book an appointment.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Project Status
-In Development
-More features and improvements will be added in future updates.
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
