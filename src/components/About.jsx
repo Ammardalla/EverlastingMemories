@@ -68,7 +68,7 @@ About Us </p>
   {/* Image */}
   <div className="group relative h-[400px] w-full overflow-hidden bg-[var(--color-espresso)] min-[900px]:h-[600px]">
     <img
-      src="images/studio.jpg"
+      src={`${import.meta.env.BASE_URL}images/studio.jpg`}
       alt="Photographer capturing a meaningful moment"
       className="block h-full w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-[1.04]"
     />
