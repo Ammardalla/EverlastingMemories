@@ -11,7 +11,7 @@ function Hero() {
         <section
         id="hero"
         className="relative flex min-h-[80vh] items-center overflow-hidden bg-[var(--color-espresso)] bg-cover bg-center px-6 py-16 sm:px-12 md:px-16"
-        style={{ backgroundImage: "url('/images/Gemini.jpg')" }}
+        style={{ backgroundImage: "url('images/Gemini.jpg')" }}
         >
         <div
             aria-hidden="true"

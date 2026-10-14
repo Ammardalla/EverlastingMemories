@@ -81,7 +81,7 @@ Contact </p>
   {/* Contact Image */}
   <div className="group relative h-[400px] w-full overflow-hidden bg-[var(--color-black)] min-[900px]:h-[600px]">
     <img
-      src="/images/contact-img.jpg"
+      src="images/contact-img.jpg"
       alt="Cinematic photography moment"
       className="block h-full w-full object-cover saturate-[0.8] contrast-[1.05] transition-transform duration-700 ease-in-out group-hover:scale-[1.04]"
     />
