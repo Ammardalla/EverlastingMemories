@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 
 function Header() {
@@ -20,14 +19,14 @@ function Header() {
         onClick={() => setIsMenuOpen(false)}
       >
         Everlasting{' '}
-        <span className="inline-block text-[var(--color-orange)] transition-transform duration-1000 ease-in hover:rotate-360">
+        <span className="inline-block text-[var(--color-orange)] transition-transform duration-2000 ease-in-out hover:rotate-360">
           Memories
         </span>
       </a>
 
       <nav className="relative" aria-label="Main navigation">
         <button
-          className="flex h-[46px] w-[46px] flex-col items-center justify-center gap-[6px] rounded-sm border border[var(--color-gold)] bg-transparent md:hidden"
+          className="flex h-[46px] w-[46px] flex-col items-center justify-center gap-[6px] rounded-sm border border-[var(--color-gold)] bg-transparent md:hidden"
           id="menu-toggle"
           type="button"
           aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
@@ -37,19 +36,19 @@ function Header() {
         >
           <span
             aria-hidden="true"
-            className={`h-0.5 w-[22px] bg-[#D4A85A] transition duration-300 ${
+            className={`h-0.5 w-[22px] bg-[var(--color-gold)] transition duration-300 ${
               isMenuOpen ? 'translate-y-2 rotate-45' : ''
             }`}
           />
           <span
             aria-hidden="true"
-            className={`h-0.5 w-[22px] bg-[#D4A85A] transition duration-300 ${
+            className={`h-0.5 w-[22px] bg-[var(--color-gold)] transition duration-300 ${
               isMenuOpen ? 'opacity-0' : ''
             }`}
           />
           <span
             aria-hidden="true"
-            className={`h-0.5 w-[22px] bg-[#D4A85A] transition duration-300 ${
+            className={`h-0.5 w-[22px] bg-[var(--color-gold)] transition duration-300 ${
               isMenuOpen ? '-translate-y-2 -rotate-45' : ''
             }`}
           />

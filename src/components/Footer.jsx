@@ -27,7 +27,7 @@ return ( <footer className="border-t border-[rgba(212,168,90,0.2)] bg-[var(--col
         EXPLORE
       </p>
 
-      <nav className="flex flex-row justify-evenly gap-3 min-[900px]:flex-col min-[900px]:items-start">
+      <nav className="flex flex-row justify-evenly gap-3 min-[900px]:flex-col min-[900px]:items-start" aria-label="footer navigation">
         <a
           href="#hero"
           className="w-fit text-sm text-[var(--color-taupe)] no-underline transition-all duration-300 hover:translate-x-1 hover:text-[var(--color-orange)]"
