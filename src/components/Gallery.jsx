@@ -114,7 +114,7 @@ function Gallery() {
               className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
 
             <figcaption className="absolute bottom-4 left-4 z-10 text-xs uppercase tracking-[0.15em] text-white opacity-100 transition duration-300 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
               {item.category}
