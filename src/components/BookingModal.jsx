@@ -133,7 +133,7 @@ function BookingModal({ isOpen, onClose }) {
               id="booking-message"
               name="message"
               rows="3"
-              maxLength={120}
+              maxLength={160}
               placeholder="Tell us a little about the session you have in mind..."
               className="min-h-[110px] w-full resize-y rounded-sm border border-[rgba(168,149,132,0.4)] bg-[var(--color-espresso)] px-3 py-3 text-sm text-[var(--color-white)] placeholder:text-[var(--color-taupe)] focus-visible:border-[var(--color-gold)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold)]"
             />
