@@ -64,9 +64,12 @@ function Gallery() {
             ? ''
             : `?category=${encodeURIComponent(activeFilter)}`
 
-        const response = await fetch(`/api/gallery${query}`, {
+      const response = await fetch(
+        `https://everlastingmemories.onrender.com/api/gallery${query}`,
+        {
           signal: controller.signal,
-        })
+        }
+      )
 
         if (!response.ok) {
           throw new Error('Failed to load gallery')
