@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import galleryItems from '../data/galleryData'
 
-const filters = ['All', 'Portraits', 'Couples', 'Wedding', 'Editorial',]
+import { useEffect, useState } from 'react'
 
-function getGalleryClasses(classes) {
+const filters = ['All', 'Portraits', 'Couples', 'Wedding', 'Editorial']
+
+function getGalleryClasses(classes = 'small') {
   const classList = classes.split(' ')
 
   let mobileClasses = 'col-span-1 row-span-1'
@@ -47,13 +47,48 @@ function getGalleryClasses(classes) {
 
 function Gallery() {
   const [activeFilter, setActiveFilter] = useState('All')
+  const [galleryItems, setGalleryItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const filteredItems =
-    activeFilter === 'All'
-      ? galleryItems
-      : galleryItems.filter(
-          (item) => item.category === activeFilter,
-        )
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function fetchGallery() {
+      setLoading(true)
+      setError('')
+
+      try {
+        const query =
+          activeFilter === 'All'
+            ? ''
+            : `?category=${encodeURIComponent(activeFilter)}`
+
+        const response = await fetch(`/api/gallery${query}`, {
+          signal: controller.signal,
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to load gallery')
+        }
+
+        const data = await response.json()
+        setGalleryItems(data)
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError('Could not load gallery. Please try again.')
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchGallery()
+
+    return () => controller.abort()
+  }, [activeFilter])
 
   return (
     <section
@@ -98,30 +133,51 @@ function Gallery() {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 auto-rows-[220px] gap-4 min-[900px]:grid-cols-4">
-        {filteredItems.map((item) => (
-          <figure
-            key={item.id}
-            className={`group relative m-0 overflow-hidden bg-[var(--color-espresso)] ${
+      {loading && (
+        <p role="status" className="py-8 text-center">
+          Loading gallery...
+        </p>
+      )}
+
+      {!loading && error && (
+        <p role="alert" className="py-8 text-center">
+          {error}
+        </p>
+      )}
+
+      {!loading && !error && galleryItems.length === 0 && (
+        <p className="py-8 text-center">
+          No photos found in this category.
+        </p>
+      )}
+
+      {!loading && !error && galleryItems.length > 0 && (
+        <div className="grid grid-cols-2 auto-rows-[220px] gap-4 min-[900px]:grid-cols-4">
+          {galleryItems.map((item) => (
+            <figure
+              key={item.id}
+              className={`group relative m-0 overflow-hidden bg-[var(--color-espresso)] ${
                 activeFilter === 'All'
-                ? getGalleryClasses(item.classes)
-                : getGalleryClasses('large')
-  }`}          >
-            <img
-              src={item.image}
-              alt={item.alt}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            />
+                  ? getGalleryClasses(item.layoutClass)
+                  : getGalleryClasses('large')
+              }`}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}${item.imageUrl}`}
+                alt={item.alt}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100" />
 
-            <figcaption className="absolute bottom-4 left-4 z-10 text-xs uppercase tracking-[0.15em] text-white opacity-100 transition duration-300 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
-              {item.category}
-            </figcaption>
-          </figure>
-        ))}
-      </div>
+              <figcaption className="absolute bottom-4 left-4 z-10 text-xs uppercase tracking-[0.15em] text-white opacity-100 transition duration-300 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
+                {item.category}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
