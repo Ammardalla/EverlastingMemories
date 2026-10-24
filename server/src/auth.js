@@ -26,12 +26,12 @@ export const auth = betterAuth({
         updateAge: 60 * 60 * 24,
     },
     trustedOrigins: [process.env.CLIENT_URL ?? 'http://localhost:5173'],
-    advanced: {
-        defaultCookieAttributes: {
-            sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production',
-        },
+advanced: {
+    defaultCookieAttributes: {
+        sameSite: 'none',
+        secure: true,
     },
+},
     socialProviders: {
     github: {
       clientId: process.env.GITHUB_CLIENT_ID,
