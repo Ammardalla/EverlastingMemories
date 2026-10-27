@@ -9,7 +9,7 @@ import { stripe } from "../lib/stripe.js";
 export const stripeWebhookRouter = Router();
 
 stripeWebhookRouter.post(
-  "/webhook",
+   "/",
   express.raw({ type: "application/json" }),
   async (req, res) => {
     const signature = req.headers["stripe-signature"];
