@@ -8,6 +8,27 @@
       "when": 1792759833987,
       "tag": "0000_past_dreadnoughts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793114536463,
+      "tag": "0001_curvy_pretty_boy",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793118289581,
+      "tag": "0002_lyrical_misty_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793121524109,
+      "tag": "0003_create_bookings_table",
+      "breakpoints": true
     }
   ]
 }

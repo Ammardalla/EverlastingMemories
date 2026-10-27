@@ -1,4 +1,13 @@
-import {pgTable, text,integer, boolean, timestamp, uniqueIndex} from "drizzle-orm/pg-core";
+
+import {
+  pgTable,
+  text,
+  integer,
+  boolean,
+  timestamp,
+  uniqueIndex,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 
 // 1. Users
 export const user = pgTable("user", {
@@ -65,6 +74,7 @@ export const galleryItems = pgTable("gallery_items", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// 6. Products
 export const products = pgTable(
   "products",
   {
@@ -83,3 +93,67 @@ export const products = pgTable(
     uniqueIndex("products_slug_idx").on(table.slug),
   ]
 );
+
+// 7. Booking enums
+export const bookingPaymentStatusEnum = pgEnum(
+  "booking_payment_status",
+  ["pending", "paid", "failed", "refunded"]
+);
+
+export const bookingStatusEnum = pgEnum(
+  "booking_status",
+  ["pending", "confirmed", "cancelled"]
+);
+
+export const bookingPaymentMethodEnum = pgEnum(
+  "booking_payment_method",
+  ["cash", "stripe"]
+);
+
+// 8. Bookings
+export const bookings = pgTable("bookings", {
+  id: text("id").primaryKey(),
+
+  customerName: text("customer_name").notNull(),
+  email: text("email").notNull(),
+
+  service: text("service").notNull(),
+
+  bookingDate: timestamp("booking_date", {
+    withTimezone: true,
+  }).notNull(),
+
+  packageId: text("package_id").notNull(),
+  photoCount: integer("photo_count").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  currency: text("currency").notNull().default("usd"),
+
+  message: text("message"),
+
+  paymentMethod: bookingPaymentMethodEnum("payment_method")
+    .notNull()
+    .default("stripe"),
+
+  paymentStatus: bookingPaymentStatusEnum("payment_status")
+    .notNull()
+    .default("pending"),
+
+  bookingStatus: bookingStatusEnum("booking_status")
+    .notNull()
+    .default("pending"),
+
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+
+  updatedAt: timestamp("updated_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
+});

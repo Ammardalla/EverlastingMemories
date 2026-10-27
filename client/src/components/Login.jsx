@@ -42,11 +42,9 @@ export default function Login() {
       {/* Header */}
       <header className="mx-auto mb-8 flex max-w-7xl items-center justify-between">
         <a href="/" className="flex items-center gap-3">
-          <span className="text-4xl text-[#c9653b]">◎</span>
-          <span className="font-serif text-xl leading-tight sm:text-2xl">
-            Everlasting
-            <br />
-            Memories
+          <span className="text-2xl text-[#c9653b]">◎</span>
+          <span className="font-serif text-xxl leading-tight sm:text-xl">
+            Everlasting Memories
           </span>
         </a>
 

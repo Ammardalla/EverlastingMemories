@@ -37,7 +37,7 @@ function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-4 bg-[var(--color-black)] px-4 py-3 md:justify-around md:gap-8">
+<header   className="sticky top-2 z-50 flex w-[80%] mx-auto items-center justify-between gap-4 rounded-xl bg-black/80 px-4 py-1 md:justify-around md:gap-8">
       <Link
         to="/"
         className="m-1 text-xl font-bold text-[var(--color-gold)] sm:text-2xl"
