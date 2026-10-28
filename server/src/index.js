@@ -8,6 +8,7 @@ import { galleryRouter } from "./routes/galleryItems.js";
 import { productsRouter } from "./routes/products.js";
 import { bookingsRouter } from "./routes/bookings.js";
 import { stripeWebhookRouter } from "./routes/stripeWebhook.js";
+import { productCheckoutRouter } from "./routes/productCheckout.js";
 
 if (!globalThis.crypto) {
   globalThis.crypto = webcrypto;
@@ -30,6 +31,7 @@ if (!globalThis.crypto) {
 
   app.use("/api/gallery", galleryRouter);
   app.use("/api/products", productsRouter);
+  app.use("/api/products/checkout", productCheckoutRouter);
   app.use("/api/bookings", bookingsRouter);
 
   app.get("/", (req, res) => {

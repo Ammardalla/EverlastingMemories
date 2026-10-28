@@ -3,7 +3,7 @@ import { Router } from "express";
 import { and, eq, ne } from "drizzle-orm";
 
 import { db } from "../db/index.js";
-import { bookings } from "../db/schema.js";
+import { bookings, orders } from "../db/schema.js";
 import { stripe } from "../lib/stripe.js";
 
 export const stripeWebhookRouter = Router();
@@ -33,8 +33,65 @@ stripeWebhookRouter.post(
     }
 
     try {
-      const session = event.data.object;
-      const bookingId = session.metadata?.bookingId;
+
+const session = event.data.object;
+
+// Handle product orders separately from bookings.
+if (session.metadata?.type === "product_order") {
+  const orderId = session.metadata?.orderId;
+
+  if (!orderId) {
+    return res.status(400).send("Missing product order ID.");
+  }
+
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.async_payment_succeeded"
+  ) {
+    if (session.payment_status === "paid") {
+      await db
+        .update(orders)
+        .set({
+          paymentStatus: "paid",
+          orderStatus: "confirmed",
+          stripePaymentIntentId:
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : null,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(orders.id, orderId),
+            eq(orders.stripeCheckoutSessionId, session.id)
+          )
+        );
+    }
+  } else if (
+    event.type === "checkout.session.expired" ||
+    event.type === "checkout.session.async_payment_failed"
+  ) {
+    await db
+      .update(orders)
+      .set({
+        paymentStatus: "failed",
+        orderStatus: "cancelled",
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(orders.id, orderId),
+          eq(orders.stripeCheckoutSessionId, session.id),
+          ne(orders.paymentStatus, "paid")
+        )
+      );
+  }
+
+  return res.json({ received: true });
+}
+
+const bookingId = session.metadata?.bookingId;
+
 
       if (!bookingId) {
         return res.json({ received: true });

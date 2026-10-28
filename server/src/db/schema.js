@@ -7,7 +7,9 @@ import {
   timestamp,
   uniqueIndex,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
+
 
 // 1. Users
 export const user = pgTable("user", {
@@ -152,4 +154,19 @@ export const bookings = pgTable("bookings", {
   })
     .notNull()
     .defaultNow(),
+});
+
+
+export const orders = pgTable("orders", {
+  id: text("id").primaryKey(),
+  customerEmail: text("customer_email").notNull(),
+  items: jsonb("items").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  currency: text("currency").notNull().default("usd"),
+  paymentStatus: text("payment_status").notNull().default("pending"),
+  orderStatus: text("order_status").notNull().default("pending"),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -1,8 +1,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import Header from "./Header";
-import Footer from "./Footer";
 import ProductCard from "./ProductCard";
 
 const API_BASE_URL =
@@ -20,6 +18,8 @@ function Shop() {
   const [sortBy, setSortBy] = useState("featured");
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   // Fetch products and current display prices from Express
   useEffect(() => {
@@ -125,6 +125,50 @@ function Shop() {
     (total, item) => total + item.price * item.quantity,
     0
   );
+  const handleCheckout = async () => {
+  if (cart.length === 0 || checkoutLoading) return;
+
+  try {
+    setCheckoutLoading(true);
+    setCheckoutError("");
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/products/checkout`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: cart.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+          })),
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Unable to start checkout. Please try again."
+      );
+    }
+
+    if (!data.checkoutUrl) {
+      throw new Error("Stripe checkout URL was not returned.");
+    }
+
+    window.location.href = data.checkoutUrl;
+  } catch (error) {
+    console.error("Checkout error:", error);
+    setCheckoutError(
+      error.message || "Something went wrong. Please try again."
+    );
+    setCheckoutLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[var(--color-black)] text-[var(--color-white)]">
@@ -374,14 +418,19 @@ function Shop() {
                   <p className="mt-3 text-xs leading-5 text-[var(--color-taupe)]">
                     Shipping and any applicable taxes are calculated separately.
                   </p>
+                  {checkoutError && (
+                    <p role="alert" className="mt-4 text-sm text-red-400">
+                      {checkoutError}
+                    </p>
+                  )}
 
                   <button
                     type="button"
-                    disabled
-                    className="mt-6 w-full cursor-not-allowed border border-[var(--color-gold)] px-6 py-4 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-gold)] opacity-60"
-                    title="Checkout will be enabled in a later step"
+                    onClick={handleCheckout}
+                    disabled={checkoutLoading || cart.length === 0}
+                    className="mt-6 w-full border border-[var(--color-gold)] px-6 py-4 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-gold)] transition-colors hover:bg-[var(--color-gold)] hover:text-[var(--color-black)] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Checkout — Coming Soon
+                    {checkoutLoading ? "Redirecting to Checkout..." : "Proceed to Checkout"}
                   </button>
                 </div>
               </>
