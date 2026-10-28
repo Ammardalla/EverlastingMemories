@@ -1,0 +1,325 @@
+
+import { useMemo, useState } from "react";
+import Header from "./Header";
+import Footer from "./Footer";
+import ProductCard from "./ProductCard";
+import products from "./products";
+
+const categories = ["ALL", "PRINTS", "ALBUMS", "KEEPSAKES"];
+
+function Shop() {
+  const [activeCategory, setActiveCategory] = useState("ALL");
+  const [sortBy, setSortBy] = useState("featured");
+  const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  const filteredProducts = useMemo(() => {
+    let result =
+      activeCategory === "ALL"
+        ? [...products]
+        : products.filter(
+            (product) => product.category === activeCategory
+          );
+
+    if (sortBy === "price-low") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-high") {
+      result.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "name") {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return result;
+  }, [activeCategory, sortBy]);
+
+  const addToCart = (product, quantity) => {
+    setCart((currentCart) => {
+      const existingItem = currentCart.find(
+        (item) => item.id === product.id
+      );
+
+      if (existingItem) {
+        return currentCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+
+      return [...currentCart, { ...product, quantity }];
+    });
+
+    setCartOpen(true);
+  };
+
+  const updateCartQuantity = (productId, change) => {
+    setCart((currentCart) =>
+      currentCart
+        .map((item) =>
+          item.id === productId
+            ? { ...item, quantity: item.quantity + change }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const cartCount = cart.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  const cartTotal = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+
+  return (
+    <div className="min-h-screen bg-[var(--color-black)] text-[var(--color-white)]">
+      <main>
+        {/* Shop Introduction */}
+        <section className="px-[8%] pb-12 pt-20 text-center sm:pb-16 sm:pt-28">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--color-gold)]">
+            The Everlasting Collection
+          </p>
+
+          <h1 className="text-[clamp(2.8rem,6vw,5rem)] font-semibold leading-tight">
+            Shop Our
+            <span className="block text-[var(--color-orange)]">
+              Collection.
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-[var(--color-taupe)] sm:text-base">
+            Discover beautiful prints, timeless albums, and meaningful
+            keepsakes made to bring your favorite memories to life.
+          </p>
+
+          <div className="mx-auto mt-8 h-px w-20 bg-[var(--color-gold)]" />
+        </section>
+
+        {/* Categories and Filters */}
+        <section className="px-[8%] pb-10">
+          <div className="flex flex-col gap-6 border-b border-[rgba(168,149,132,0.25)] pb-8 lg:flex-row lg:items-center lg:justify-between">
+            <div
+              className="flex flex-wrap gap-2"
+              aria-label="Product categories"
+            >
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setActiveCategory(category)}
+                  aria-pressed={activeCategory === category}
+                  className={`border px-5 py-3 text-xs font-semibold tracking-[0.12em] transition-all duration-300 ${
+                    activeCategory === category
+                      ? "border-[var(--color-gold)] bg-[var(--color-gold)] text-[var(--color-black)]"
+                      : "border-[rgba(168,149,132,0.35)] text-[var(--color-taupe)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3">
+              <label
+                htmlFor="shop-sort"
+                className="shrink-0 text-xs uppercase tracking-[0.12em] text-[var(--color-taupe)]"
+              >
+                Sort by
+              </label>
+
+              <select
+                id="shop-sort"
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+                className="min-h-11 min-w-0 flex-1 border border-[rgba(168,149,132,0.35)] bg-[var(--color-black)] px-3 text-sm text-[var(--color-white)] outline-none focus:border-[var(--color-gold)] sm:flex-none"
+              >
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="name">Name: A–Z</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 py-6">
+            <p className="text-sm text-[var(--color-taupe)]">
+              Showing{" "}
+              <span className="text-[var(--color-white)]">
+                {filteredProducts.length}
+              </span>{" "}
+              {filteredProducts.length === 1 ? "product" : "products"}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setCartOpen(true)}
+              className="flex items-center gap-2 border border-[var(--color-gold)] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-gold)] transition-colors hover:bg-[var(--color-gold)] hover:text-[var(--color-black)]"
+            >
+              <span aria-hidden="true">♧</span>
+              Cart ({cartCount})
+            </button>
+          </div>
+        </section>
+
+        {/* Product Grid */}
+        <section className="px-[8%] pb-24">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={addToCart}
+              />
+            ))}
+          </div>
+
+          {filteredProducts.length === 0 && (
+            <p className="py-20 text-center text-[var(--color-taupe)]">
+              No products found in this category.
+            </p>
+          )}
+        </section>
+      </main>
+
+  {/* Footer Bottom */}
+  <div className="flex flex-col my-2 items-start justify-between gap-2 border-t border-[rgba(168,149,132,0.2)] pt-6 min-[600px]:flex-row min-[600px]:items-center">
+    <p className="m-2 text-[0.7rem] tracking-[0.03em] text-[var(--color-taupe)]">
+      © 2026 Everlasting Memories. All rights reserved.
+    </p>
+
+    <p className="m-2 text-[0.7rem] tracking-[0.03em] text-[var(--color-taupe)]">
+      Photography &amp; Visual Stories
+    </p>
+  </div>
+      {/* Shopping Cart Drawer */}
+      {cartOpen && (
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/70"
+          onClick={() => setCartOpen(false)}
+        >
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cart-title"
+            className="flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-[rgba(168,149,132,0.3)] bg-[var(--color-black)] p-6 text-[var(--color-white)] sm:p-8"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-[rgba(168,149,132,0.25)] pb-5">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-gold)]">
+                  Your Selection
+                </p>
+                <h2 id="cart-title" className="mt-2 text-2xl font-medium">
+                  Shopping Cart ({cartCount})
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCartOpen(false)}
+                aria-label="Close shopping cart"
+                className="p-2 text-2xl text-[var(--color-taupe)] hover:text-[var(--color-gold)]"
+              >
+                ×
+              </button>
+            </div>
+
+            {cart.length === 0 ? (
+              <div className="flex flex-1 flex-col items-center justify-center text-center">
+                <p className="text-lg">Your cart is empty.</p>
+                <p className="mt-2 text-sm text-[var(--color-taupe)]">
+                  Discover something special for your memories.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setCartOpen(false)}
+                  className="mt-6 border border-[var(--color-gold)] px-6 py-3 text-xs uppercase tracking-wider text-[var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-[var(--color-black)]"
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex-1 divide-y divide-[rgba(168,149,132,0.2)]">
+                  {cart.map((item) => (
+                    <div key={item.id} className="flex gap-4 py-5">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-24 w-20 shrink-0 bg-[var(--color-espresso)] object-cover"
+                      />
+
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-medium">{item.name}</h3>
+                        <p className="mt-2 text-sm text-[var(--color-gold)]">
+                          ${Number(item.price).toFixed(2)}
+                        </p>
+
+                        <div className="mt-3 flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => updateCartQuantity(item.id, -1)}
+                            aria-label={`Remove one ${item.name}`}
+                            className="h-8 w-8 border border-[rgba(168,149,132,0.35)] hover:border-[var(--color-gold)]"
+                          >
+                            −
+                          </button>
+
+                          <span className="text-sm tabular-nums">
+                            {item.quantity}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => updateCartQuantity(item.id, 1)}
+                            aria-label={`Add one ${item.name}`}
+                            className="h-8 w-8 border border-[rgba(168,149,132,0.35)] hover:border-[var(--color-gold)]"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      <p className="shrink-0 text-sm">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-[rgba(168,149,132,0.3)] pt-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[var(--color-taupe)]">
+                      Subtotal
+                    </span>
+                    <span className="text-xl text-[var(--color-gold)]">
+                      ${cartTotal.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-xs leading-5 text-[var(--color-taupe)]">
+                    Shipping and any applicable taxes are calculated separately.
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled
+                    className="mt-6 w-full cursor-not-allowed border border-[var(--color-gold)] px-6 py-4 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-gold)] opacity-60"
+                    title="Checkout will be enabled in a later step"
+                  >
+                    Checkout — Coming Soon
+                  </button>
+                </div>
+              </>
+            )}
+          </aside>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Shop;

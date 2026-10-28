@@ -23,12 +23,20 @@ const products = [
     category: "PRINTS",
     description: "A timeless framed photograph, ready to display and cherish.",
     price: 29.99,
+    image: `${import.meta.env.BASE_URL}images/framed-printed.jpg`,
+  },
+{
+    id: 4,
+    name: "Framed Photo Print",
+    category: "PRINTS",
+    description: "A timeless framed photograph for fields and roses, ready to display and cherish.",
+    price: 29.99,
     image: `${import.meta.env.BASE_URL}images/framed-print.jpg`,
   },
 
   // ALBUMS
   {
-    id: 4,
+    id: 5,
     name: "Classic Memory Album",
     category: "ALBUMS",
     description: "A beautiful album for keeping your most treasured memories.",
@@ -36,7 +44,7 @@ const products = [
     image: `${import.meta.env.BASE_URL}images/classic-album.jpg`,
   },
   {
-    id: 5,
+    id: 6,
     name: "Premium Wedding Album",
     category: "ALBUMS",
     description: "An elegant album designed for life's most special celebrations.",
@@ -44,17 +52,25 @@ const products = [
     image: `${import.meta.env.BASE_URL}images/wedding-album.jpg`,
   },
   {
-    id: 6,
+    id: 7,
     name: "Travel Memories Album",
     category: "ALBUMS",
     description: "Keep your favorite adventures together in one special place.",
     price: 44.99,
     image: `${import.meta.env.BASE_URL}images/travel-album.jpg`,
   },
+    {
+    id: 8,
+    name: "Travel Memories Album",
+    category: "ALBUMS",
+    description: "Keep your favorite adventures together in one special place.",
+    price: 44.99,
+    image: `${import.meta.env.BASE_URL}images/children-album.jpg`,
+  },
 
   // KEEPSAKES
   {
-    id: 7,
+    id: 9,
     name: "Memory Keepsake Box",
     category: "KEEPSAKES",
     description: "A thoughtful box for photographs and meaningful little treasures.",
@@ -62,7 +78,7 @@ const products = [
     image: `${import.meta.env.BASE_URL}images/keepsake-box.jpg`,
   },
   {
-    id: 8,
+    id: 10,
     name: "Personalized Photo Gift",
     category: "KEEPSAKES",
     description: "A personal gift that turns a favorite moment into a lasting memory.",
@@ -70,12 +86,20 @@ const products = [
     image: `${import.meta.env.BASE_URL}images/photo-gift.jpg`,
   },
   {
-    id: 9,
+    id: 11,
     name: "Memory Gift Set",
     category: "KEEPSAKES",
     description: "A curated set of keepsakes made for meaningful occasions.",
     price: 39.99,
     image: `${import.meta.env.BASE_URL}images/memory-gift-set.jpg`,
+  },
+    {
+    id: 12,
+    name: "Memory Gift Set",
+    category: "KEEPSAKES",
+    description: "A curated set of keepsakes made for meaningful occasions.",
+    price: 39.99,
+    image: `${import.meta.env.BASE_URL}images/memory-gift-set2.jpg`,
   },
 ];
 
