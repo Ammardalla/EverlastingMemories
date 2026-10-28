@@ -10,6 +10,8 @@ import Footer from "./components/Footer";
 import BookingSuccess from "./components/BookingSuccess";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import Shopping from "./components/Shopping";
+import Shop from "./components/Shop";
 
 function HomePage() {
   return (
@@ -18,6 +20,7 @@ function HomePage() {
       <main>
         <Hero />
         <Gallery />
+        <Shopping />
         <About />
         <Contact />
       </main>
@@ -31,6 +34,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/shop" element={<Shop />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/booking-success" element={<BookingSuccess />} />
