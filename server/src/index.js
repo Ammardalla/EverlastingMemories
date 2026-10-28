@@ -5,6 +5,7 @@ import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./auth.js";
 import { galleryRouter } from "./routes/galleryItems.js";
+import { productsRouter } from "./routes/products.js";
 import { bookingsRouter } from "./routes/bookings.js";
 import { stripeWebhookRouter } from "./routes/stripeWebhook.js";
 
@@ -28,6 +29,7 @@ if (!globalThis.crypto) {
   app.use(express.json());
 
   app.use("/api/gallery", galleryRouter);
+  app.use("/api/products", productsRouter);
   app.use("/api/bookings", bookingsRouter);
 
   app.get("/", (req, res) => {

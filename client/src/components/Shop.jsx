@@ -1,17 +1,69 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import Header from "./Header";
 import Footer from "./Footer";
 import ProductCard from "./ProductCard";
-import products from "./products";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://everlastingmemories.onrender.com";
 
 const categories = ["ALL", "PRINTS", "ALBUMS", "KEEPSAKES"];
 
 function Shop() {
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState("");
+
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [sortBy, setSortBy] = useState("featured");
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+
+  // Fetch products and current display prices from Express
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadProducts() {
+      try {
+        setLoadingProducts(true);
+        setProductsError("");
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/products`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error("Could not load products.");
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid products response.");
+        }
+
+        setProducts(data);
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Failed to load products:", error);
+          setProductsError(
+            "Unable to load products. Please try again."
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoadingProducts(false);
+        }
+      }
+    }
+
+    loadProducts();
+
+    return () => controller.abort();
+  }, []);
 
   const filteredProducts = useMemo(() => {
     let result =
@@ -30,7 +82,7 @@ function Shop() {
     }
 
     return result;
-  }, [activeCategory, sortBy]);
+  }, [products, activeCategory, sortBy]);
 
   const addToCart = (product, quantity) => {
     setCart((currentCart) => {
@@ -167,13 +219,32 @@ function Shop() {
         {/* Product Grid */}
         <section className="px-[8%] pb-24">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={addToCart}
-              />
-            ))}
+
+{loadingProducts ? (
+  <p className="col-span-full py-20 text-center text-[var(--color-taupe)]">
+    Loading products...
+  </p>
+) : productsError ? (
+  <div className="col-span-full py-20 text-center">
+    <p className="text-red-400">{productsError}</p>
+    <button
+      type="button"
+      onClick={() => window.location.reload()}
+      className="mt-4 border border-[var(--color-gold)] px-5 py-3 text-sm text-[var(--color-gold)]"
+    >
+      Try Again
+    </button>
+  </div>
+) : (
+  filteredProducts.map((product) => (
+    <ProductCard
+      key={product.id}
+      product={product}
+      onAddToCart={addToCart}
+    />
+  ))
+)}
+
           </div>
 
           {filteredProducts.length === 0 && (

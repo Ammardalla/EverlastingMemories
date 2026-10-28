@@ -74,25 +74,21 @@ export const galleryItems = pgTable("gallery_items", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// 6. Products
-export const products = pgTable(
-  "products",
-  {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-    title: text("title").notNull(),
-    slug: text("slug").notNull(),
-    tagline: text("tagline"),
-    priceCent: integer("price_cent").notNull(),
-    currency: text("currency").notNull().default("USD"),
-    stock: integer("stock").notNull().default(0),
-    featured: boolean("featured").notNull().default(false),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  },
-  (table) => [
-    uniqueIndex("products_slug_idx").on(table.slug),
-  ]
-);
+
+ // 6. Shop products
+export const products = pgTable("products", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  category: text("category").notNull(),
+  description: text("description").notNull(),
+  priceCents: integer("price_cents").notNull(),
+  currency: text("currency").notNull().default("usd"),
+  imageUrl: text("image_url").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 
 // 7. Booking enums
 export const bookingPaymentStatusEnum = pgEnum(
