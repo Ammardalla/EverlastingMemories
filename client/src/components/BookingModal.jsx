@@ -249,7 +249,7 @@ const response = await fetch(
 
   {isLoggedIn && (
     <span className="text-xs font-semibold text-green-400">
-      خصم 10%
+      discount 10%
     </span>
   )}
 </div>
