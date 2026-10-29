@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authClient } from "../lib/auth-client";
@@ -9,6 +8,10 @@ function Header() {
   const navigate = useNavigate();
 
   const { data: session, isPending } = authClient.useSession();
+
+  const user = session?.user;
+  const userName =
+    user?.name?.trim()?.split(" ")[0] || "صديقنا";
 
   const navLinks = [
     { label: "Home", href: "/#hero" },
@@ -38,24 +41,28 @@ function Header() {
   }
 
   return (
-<header   className="sticky top-2 z-50 flex w-[80%] mx-auto items-center justify-between gap-4 rounded-xl bg-black/80 px-4 py-1 md:justify-around md:gap-8">
+    <header className="sticky top-2 z-50 mx-auto flex w-[95%] items-center justify-between gap-3 rounded-xl bg-black/85 px-3 py-2 shadow-lg backdrop-blur-md sm:w-[90%] sm:px-4 md:w-[90%] md:gap-5 lg:w-[85%]">
       <Link
         to="/"
-        className="m-1 text-xl font-bold text-[var(--color-gold)] sm:text-2xl"
+        className="shrink-0 text-lg font-bold text-[var(--color-gold)] sm:text-xl lg:text-2xl"
         aria-label="Everlasting Memories - Home"
         onClick={() => setIsMenuOpen(false)}
       >
         Everlasting{" "}
-        <span className="inline-block text-[var(--color-orange)] transition-transform duration-2000 ease-in-out hover:rotate-360">
+        <span className="inline-block text-[var(--color-orange)] transition-transform duration-500 hover:rotate-6">
           Memories
         </span>
       </Link>
 
       <nav className="relative" aria-label="Main navigation">
         <button
-          className="flex h-[46px] w-[46px] flex-col items-center justify-center gap-[6px] rounded-sm border border-[var(--color-gold)] bg-transparent md:hidden"
+          className="flex h-[42px] w-[42px] flex-col items-center justify-center gap-[6px] rounded-sm border border-[var(--color-gold)] bg-transparent md:hidden"
           type="button"
-          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-label={
+            isMenuOpen
+              ? "Close navigation menu"
+              : "Open navigation menu"
+          }
           aria-expanded={isMenuOpen}
           aria-controls="nav-links"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -75,7 +82,9 @@ function Header() {
           <span
             aria-hidden="true"
             className={`h-0.5 w-[22px] bg-[var(--color-gold)] transition duration-300 ${
-              isMenuOpen ? "-translate-y-2 -rotate-45" : ""
+              isMenuOpen
+                ? "-translate-y-2 -rotate-45"
+                : ""
             }`}
           />
         </button>
@@ -91,7 +100,7 @@ function Header() {
               <a
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="block p-4 text-[#FAF7F2] transition-colors duration-200 hover:bg-[rgba(212,168,90,0.08)] hover:text-[#D4A85A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A85A] md:px-3"
+                className="block p-3 text-sm text-[#FAF7F2] transition-colors duration-200 hover:bg-[rgba(212,168,90,0.08)] hover:text-[#D4A85A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4A85A] md:px-2 lg:px-3"
               >
                 {link.label}
               </a>
@@ -100,25 +109,56 @@ function Header() {
         </ul>
       </nav>
 
-      {isPending ? (
-        <span className="text-sm text-[var(--color-gold)]">...</span>
-      ) : session?.user ? (
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="shrink-0 rounded-full border border-[var(--color-gold)] px-5 py-2.5 text-sm font-semibold text-[var(--color-gold)] transition hover:bg-[var(--color-gold)] hover:text-black disabled:opacity-60"
-        >
-          {isLoggingOut ? "Logging out..." : "Log Out"}
-        </button>
-      ) : (
-        <Link
-          to="/login"
-          className="shrink-0 rounded-full bg-[var(--color-orange)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-80"
-        >
-          Log In
-        </Link>
-      )}
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        {!isPending && (
+          <div className="hidden text-right sm:block">
+            {user ? (
+              <>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                  Welcome to our family
+                </p>
+                <p className="max-w-[180px] truncate text-sm font-semibold text-[#FAF7F2] lg:max-w-[220px]">
+                  Welcome, {userName} 🤎
+                </p>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="group block"
+              >
+                <p className="text-xs font-semibold text-[var(--color-gold)] transition-colors group-hover:text-white lg:text-sm">
+                  ✨ Join our family
+                </p>
+                <p className="text-[10px] text-[#FAF7F2] opacity-80 lg:text-xs">
+                  Get 10% off everything!
+                </p>
+              </Link>
+            )}
+          </div>
+        )}
+
+        {isPending ? (
+          <span className="text-sm text-[var(--color-gold)]">
+            ...
+          </span>
+        ) : user ? (
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="shrink-0 rounded-full border border-[var(--color-gold)] px-3 py-2 text-xs font-semibold text-[var(--color-gold)] transition hover:bg-[var(--color-gold)] hover:text-black disabled:opacity-60 sm:px-4 sm:text-sm lg:px-5"
+          >
+            {isLoggingOut ? "Logging out..." : "Log Out"}
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            className="shrink-0 rounded-full bg-[var(--color-orange)] px-3 py-2 text-xs font-semibold text-white transition hover:opacity-80 sm:px-4 sm:text-sm lg:px-5"
+          >
+            Log In
+          </Link>
+        )}
+      </div>
     </header>
   );
 }
