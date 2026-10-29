@@ -11,7 +11,7 @@ function Header() {
 
   const user = session?.user;
   const userName =
-    user?.name?.trim()?.split(" ")[0] || "صديقنا";
+    user?.name?.trim()?.split(" ")[0] || "friend";
 
   const navLinks = [
     { label: "Home", href: "/#hero" },
@@ -41,8 +41,7 @@ function Header() {
   }
 
   return (
-    <header className="sticky top-2 z-50 mx-auto flex w-[95%] items-center justify-between gap-3 rounded-xl bg-black/85 px-3 py-2 shadow-lg backdrop-blur-md sm:w-[90%] sm:px-4 md:w-[90%] md:gap-5 lg:w-[85%]">
-      <Link
+<header className="sticky top-2 z-50 mx-auto flex w-[95%] items-center justify-between gap-3 rounded-xl bg-black/85 px-4 py-2 shadow-lg backdrop-blur-md sm:w-[90%] sm:px-5 md:w-[92%] md:gap-5 md:px-6 lg:w-[88%] lg:px-8 xl:w-[85%]">      <Link
         to="/"
         className="shrink-0 text-lg font-bold text-[var(--color-gold)] sm:text-xl lg:text-2xl"
         aria-label="Everlasting Memories - Home"
@@ -54,8 +53,8 @@ function Header() {
         </span>
       </Link>
 
-      <nav className="relative" aria-label="Main navigation">
-        <button
+<nav className="relative md:flex-1 md:flex md:justify-center" aria-label="Main navigation">
+          <button
           className="flex h-[42px] w-[42px] flex-col items-center justify-center gap-[6px] rounded-sm border border-[var(--color-gold)] bg-transparent md:hidden"
           type="button"
           aria-label={
@@ -109,8 +108,8 @@ function Header() {
         </ul>
       </nav>
 
-      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-        {!isPending && (
+<div className="flex shrink-0 items-center gap-3 sm:gap-4 lg:gap-8">
+          {!isPending && (
           <div className="hidden text-right sm:block">
             {user ? (
               <>

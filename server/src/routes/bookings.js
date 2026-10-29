@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
@@ -6,8 +5,11 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { bookings } from "../db/schema.js";
 import { stripe } from "../lib/stripe.js";
+import { auth } from "../auth.js";
 
 export const bookingsRouter = Router();
+
+const DISCOUNT_PERCENT = 10;
 
 const packages = {
   "10": { photos: 10, amountCents: 3000, label: "Essential" },
@@ -26,21 +28,30 @@ bookingsRouter.post("/checkout", async (req, res) => {
   let bookingId;
 
   try {
-        const {
-        name,
-        email,
-        service,
-        date,
-        packageId,
-        message,
-        paymentMethod,
-        } = req.body;
+    const {
+      name,
+      email,
+      service,
+      date,
+      packageId,
+      message,
+      paymentMethod,
+    } = req.body ?? {};
+
+    // Verify the user's real session on the server.
+    const session = await auth.api.getSession({
+      headers: req.headers,
+    });
+
+    const isLoggedIn = Boolean(session?.user?.id);
 
     if (
       typeof name !== "string" ||
-      !name.trim() ||
+      name.trim().length < 2 ||
+      name.trim().length > 120 ||
       typeof email !== "string" ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
+      email.trim().length > 254 ||
       !allowedServices.includes(service) ||
       typeof date !== "string" ||
       !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
@@ -64,6 +75,17 @@ bookingsRouter.post("/checkout", async (req, res) => {
     }
 
     const selectedPackage = packages[packageId];
+
+    // Calculate the final amount on the server in cents.
+    const originalAmountCents = selectedPackage.amountCents;
+    const discountPercent = isLoggedIn ? DISCOUNT_PERCENT : 0;
+
+    const amountCents = isLoggedIn
+      ? Math.round(
+          (originalAmountCents * (100 - DISCOUNT_PERCENT)) / 100
+        )
+      : originalAmountCents;
+
     bookingId = randomUUID();
 
     await db.insert(bookings).values({
@@ -74,42 +96,54 @@ bookingsRouter.post("/checkout", async (req, res) => {
       bookingDate,
       packageId,
       photoCount: selectedPackage.photos,
-      amountCents: selectedPackage.amountCents,
+      amountCents,
       currency: "usd",
       message:
-       typeof message === "string" ? message.trim() || null : null,
+        typeof message === "string" ? message.trim() || null : null,
       paymentMethod,
       paymentStatus: "pending",
       bookingStatus: "pending",
     });
 
     if (paymentMethod === "cash") {
-        return res.status(201).json({
-            bookingId,
-            paymentMethod: "cash",
-            message: "Booking saved. Payment is due in cash at the shop.",
-        });
+      return res.status(201).json({
+        bookingId,
+        paymentMethod: "cash",
+        originalAmountCents,
+        discountPercent,
+        amountCents,
+        currency: "usd",
+        message: "Booking saved. Payment is due in cash at the shop.",
+      });
     }
 
-    const clientUrl =
-      process.env.CLIENT_URL || "http://localhost:5173";
+    const clientUrl = (
+      process.env.CLIENT_URL || "http://localhost:5173"
+    ).replace(/\/+$/, "");
 
-    const session = await stripe.checkout.sessions.create({
+    const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: email.trim(),
       client_reference_id: bookingId,
       metadata: {
         bookingId,
         packageId,
+        discountPercent: String(discountPercent),
+        originalAmountCents: String(originalAmountCents),
+        amountCents: String(amountCents),
       },
       line_items: [
         {
           price_data: {
             currency: "usd",
-            unit_amount: selectedPackage.amountCents,
+            unit_amount: amountCents,
             product_data: {
               name: `${selectedPackage.label} Photography Package`,
-              description: `${selectedPackage.photos} edited photos`,
+              description: `${selectedPackage.photos} edited photos${
+                discountPercent
+                  ? ` (${discountPercent}% member discount)`
+                  : ""
+              }`,
             },
           },
           quantity: 1,
@@ -117,24 +151,28 @@ bookingsRouter.post("/checkout", async (req, res) => {
       ],
       success_url:
         `${clientUrl}/booking-success` +
-        `?booking_id=${bookingId}` +
+        `?booking_id=${encodeURIComponent(bookingId)}` +
         `&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:
         `${clientUrl}/booking-cancelled` +
-        `?booking_id=${bookingId}`,
+        `?booking_id=${encodeURIComponent(bookingId)}`,
     });
 
     await db
       .update(bookings)
       .set({
-        stripeCheckoutSessionId: session.id,
+        stripeCheckoutSessionId: stripeSession.id,
         updatedAt: new Date(),
       })
       .where(eq(bookings.id, bookingId));
 
     return res.status(201).json({
-      checkoutUrl: session.url,
+      checkoutUrl: stripeSession.url,
       bookingId,
+      originalAmountCents,
+      discountPercent,
+      amountCents,
+      currency: "usd",
     });
   } catch (error) {
     console.error("Booking checkout error:", error);

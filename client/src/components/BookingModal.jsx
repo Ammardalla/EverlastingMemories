@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react'
+import { useSession } from '../lib/auth-client'
 
 const packages = [
   { id: '10', photos: 10, price: 30, label: 'Essential' },
@@ -10,10 +11,28 @@ const packages = [
 function BookingModal({ isOpen, onClose }) {
   const dialogRef = useRef(null)
 
+  const { data: session, isPending: sessionLoading } = useSession()
+  const isLoggedIn = Boolean(session?.user?.id) && !sessionLoading
+
   const [selectedPackage, setSelectedPackage] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [status, setStatus] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const getPackagePrice = (item) => {
+  const originalCents = Math.round(item.price * 100)
+
+  const discountedCents = Math.round(
+    (originalCents * 90) / 100
+  )
+
+  return {
+    original: originalCents / 100,
+    discounted: discountedCents / 100,
+    finalPrice: isLoggedIn
+      ? discountedCents / 100
+      : originalCents / 100,
+  }
+}
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -64,16 +83,17 @@ async function handleSubmit(event) {
   }
 
   try {
-    const response = await fetch(
-      'https://everlastingmemories.onrender.com/api/bookings/checkout',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingData),
-      }
-    )
+const response = await fetch(
+  'https://everlastingmemories.onrender.com/api/bookings/checkout',
+  {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(bookingData),
+  }
+)
 
     const data = await response.json()
 
@@ -216,9 +236,23 @@ async function handleSubmit(event) {
                     Edited Photos
                   </span>
 
-                  <span className="mt-4 border-t border-[rgba(168,149,132,0.2)] pt-3 text-2xl font-semibold text-[var(--color-orange)]">
-                    ${item.price}
-                  </span>
+<div className="mt-4 flex flex-wrap items-baseline gap-2 border-t border-[rgba(168,149,132,0.2)] pt-3">
+  {isLoggedIn && (
+    <span className="text-sm text-red-400 line-through">
+      ${getPackagePrice(item).original.toFixed(2)}
+    </span>
+  )}
+
+  <span className="text-2xl font-semibold text-[var(--color-orange)]">
+    ${getPackagePrice(item).finalPrice.toFixed(2)}
+  </span>
+
+  {isLoggedIn && (
+    <span className="text-xs font-semibold text-green-400">
+      خصم 10%
+    </span>
+  )}
+</div>
 
                   <span className="mt-1 text-xs text-[var(--color-taupe)]">
                     One-time package
@@ -469,9 +503,29 @@ async function handleSubmit(event) {
                   Total
                 </span>
 
-                <span className="text-2xl font-semibold text-[var(--color-orange)]">
-                  ${packages.find((item) => item.id === selectedPackage)?.price}
-                </span>
+{(() => {
+  const chosenPackage = packages.find(
+    (item) => item.id === selectedPackage
+  )
+
+  if (!chosenPackage) return null
+
+  const price = getPackagePrice(chosenPackage)
+
+  return (
+    <div className="flex items-center gap-3">
+      {isLoggedIn && (
+        <span className="text-base text-red-400 line-through">
+          ${price.original.toFixed(2)}
+        </span>
+      )}
+
+      <span className="text-2xl font-semibold text-[var(--color-orange)]">
+        ${price.finalPrice.toFixed(2)}
+      </span>
+    </div>
+  )
+})()}
               </div>
 
               <p className="mt-3 text-xs text-[var(--color-taupe)]">

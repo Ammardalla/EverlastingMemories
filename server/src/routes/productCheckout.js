@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { eq, inArray } from "drizzle-orm";
@@ -6,8 +5,11 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { products, orders } from "../db/schema.js";
 import { stripe } from "../lib/stripe.js";
+import { auth } from "../auth.js";
 
 export const productCheckoutRouter = Router();
+
+const DISCOUNT_PERCENT = 10;
 
 productCheckoutRouter.post("/", async (req, res) => {
   let orderId;
@@ -20,8 +22,14 @@ productCheckoutRouter.post("/", async (req, res) => {
       customerPhone,
       customerAddress,
     } = req.body ?? {};
+    
+    // Check the real login session on the server.
+    const session = await auth.api.getSession({
+      headers: req.headers,
+    });
 
-    // Validate customer information
+    const isLoggedIn = Boolean(session?.user?.id);
+
     const name =
       typeof customerName === "string" ? customerName.trim() : "";
     const email =
@@ -31,7 +39,9 @@ productCheckoutRouter.post("/", async (req, res) => {
     const phone =
       typeof customerPhone === "string" ? customerPhone.trim() : "";
     const address =
-      typeof customerAddress === "string" ? customerAddress.trim() : "";
+      typeof customerAddress === "string"
+        ? customerAddress.trim()
+        : "";
 
     if (
       name.length < 2 ||
@@ -44,11 +54,11 @@ productCheckoutRouter.post("/", async (req, res) => {
       address.length > 500
     ) {
       return res.status(400).json({
-        error: "Please enter a valid name, email, phone number, and delivery address.",
+        error:
+          "Please enter a valid name, email, phone number, and delivery address.",
       });
     }
 
-    // Validate cart
     if (!Array.isArray(items) || items.length === 0 || items.length > 50) {
       return res.status(400).json({
         error: "Please provide valid cart items.",
@@ -86,6 +96,7 @@ productCheckoutRouter.post("/", async (req, res) => {
 
     const productIds = [...quantities.keys()];
 
+    // Always retrieve trusted prices from the database.
     const rows = await db
       .select()
       .from(products)
@@ -100,13 +111,6 @@ productCheckoutRouter.post("/", async (req, res) => {
       });
     }
 
-    const orderItems = rows.map((product) => ({
-      productId: product.id,
-      name: product.name,
-      quantity: quantities.get(product.id),
-      unitAmountCents: product.priceCents,
-    }));
-
     const currency = rows[0].currency.toLowerCase();
 
     if (
@@ -118,6 +122,25 @@ productCheckoutRouter.post("/", async (req, res) => {
         error: "Products must use the same currency.",
       });
     }
+
+    const orderItems = rows.map((product) => {
+      const originalUnitAmountCents = product.priceCents;
+
+      const unitAmountCents = isLoggedIn
+        ? Math.round(
+            (originalUnitAmountCents * (100 - DISCOUNT_PERCENT)) / 100
+          )
+        : originalUnitAmountCents;
+
+      return {
+        productId: product.id,
+        name: product.name,
+        quantity: quantities.get(product.id),
+        originalUnitAmountCents,
+        unitAmountCents,
+        discountPercent: isLoggedIn ? DISCOUNT_PERCENT : 0,
+      };
+    });
 
     const amountCents = orderItems.reduce(
       (total, item) =>
@@ -131,7 +154,6 @@ productCheckoutRouter.post("/", async (req, res) => {
       });
     }
 
-    // Save customer details and order in Neon
     orderId = randomUUID();
 
     await db.insert(orders).values({
@@ -151,8 +173,7 @@ productCheckoutRouter.post("/", async (req, res) => {
       process.env.CLIENT_URL || "http://localhost:5173"
     ).replace(/\/+$/, "");
 
-    // Create Stripe Checkout session
-    const session = await stripe.checkout.sessions.create({
+    const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_creation: "always",
       customer_email: email,
@@ -160,6 +181,7 @@ productCheckoutRouter.post("/", async (req, res) => {
       metadata: {
         type: "product_order",
         orderId,
+        discountPercent: String(isLoggedIn ? DISCOUNT_PERCENT : 0),
       },
       line_items: orderItems.map((item) => ({
         price_data: {
@@ -180,14 +202,19 @@ productCheckoutRouter.post("/", async (req, res) => {
     await db
       .update(orders)
       .set({
-        stripeCheckoutSessionId: session.id,
+        stripeCheckoutSessionId: stripeSession.id,
         updatedAt: new Date(),
       })
       .where(eq(orders.id, orderId));
 
     return res.status(201).json({
-      checkoutUrl: session.url,
+      checkoutUrl: stripeSession.url,
       orderId,
+      discountApplied: isLoggedIn,
+      discountPercent: isLoggedIn ? DISCOUNT_PERCENT : 0,
+      amountCents,
+      currency,
+      items: orderItems,
     });
   } catch (error) {
     console.error("Product checkout error:", error);

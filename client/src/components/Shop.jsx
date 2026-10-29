@@ -1,4 +1,5 @@
 
+import { useSession } from "../lib/auth-client";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
@@ -25,6 +26,18 @@ function Shop() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const { data: session, isPending: sessionLoading } = useSession();
+  const isLoggedIn = Boolean(session?.user?.id);
+
+  const getItemPrice = (item) => {
+  const originalPrice = Math.round(Number(item.price) * 100);
+
+  if (sessionLoading || !isLoggedIn) {
+    return originalPrice / 100;
+  }
+
+  return Math.round(originalPrice * 90 / 100) / 100;
+};
 
   useEffect(() => {
     const controller = new AbortController();
@@ -121,10 +134,10 @@ function Shop() {
     0
   );
 
-  const cartTotal = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+const cartTotal = cart.reduce(
+  (total, item) => total + getItemPrice(item) * item.quantity,
+  0
+);
 
   const handleCheckout = async (event) => {
     event.preventDefault();
@@ -156,6 +169,7 @@ function Shop() {
         `${API_BASE_URL}/api/products/checkout`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -315,11 +329,12 @@ function Shop() {
               </p>
             ) : (
               filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={addToCart}
-                />
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={addToCart}
+                isLoggedIn={isLoggedIn}
+              />
               ))
             )}
           </div>
@@ -394,9 +409,27 @@ function Shop() {
 
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-medium">{item.name}</h3>
-                        <p className="mt-2 text-sm text-[var(--color-gold)]">
-                          ${Number(item.price).toFixed(2)}
-                        </p>
+<div className="mt-2 flex flex-wrap items-center gap-2">
+  {isLoggedIn && !sessionLoading ? (
+    <>
+      <span className="text-sm text-red-400 line-through">
+        ${Number(item.price).toFixed(2)}
+      </span>
+
+      <span className="text-sm font-semibold text-[var(--color-gold)]">
+        ${getItemPrice(item).toFixed(2)}
+      </span>
+
+      <span className="text-xs text-green-400">
+        discount 10%
+      </span>
+    </>
+  ) : (
+    <span className="text-sm text-[var(--color-gold)]">
+      ${Number(item.price).toFixed(2)}
+    </span>
+  )}
+</div>
 
                         <div className="mt-3 flex items-center gap-3">
                           <button
@@ -421,9 +454,9 @@ function Shop() {
                         </div>
                       </div>
 
-                      <p className="shrink-0 text-sm">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </p>
+<p className="shrink-0 text-sm">
+  ${(getItemPrice(item) * item.quantity).toFixed(2)}
+</p>
                     </div>
                   ))}
                 </div>
