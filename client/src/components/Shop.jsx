@@ -1,6 +1,6 @@
 
 import { useEffect, useMemo, useState } from "react";
-
+import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
 
 const API_BASE_URL =
@@ -172,6 +172,16 @@ function Shop() {
 
   return (
     <div className="min-h-screen bg-[var(--color-black)] text-[var(--color-white)]">
+    <div className="px-[8%] pt-6">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 text-sm text-[var(--color-taupe)] transition-colors hover:text-[var(--color-gold)]"
+      >
+        <span aria-hidden="true">←</span>
+        Back to Home
+      </Link>
+    </div>
+
       <main>
         {/* Shop Introduction */}
         <section className="px-[8%] pb-12 pt-20 text-center sm:pb-16 sm:pt-28">
