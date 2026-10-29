@@ -13,17 +13,47 @@ productCheckoutRouter.post("/", async (req, res) => {
   let orderId;
 
   try {
-const { items } = req.body ?? {};
+    const {
+      items,
+      customerName,
+      customerEmail,
+      customerPhone,
+      customerAddress,
+    } = req.body ?? {};
 
-if (
-  !Array.isArray(items) ||
-  items.length === 0 ||
-  items.length > 50
-) {
-  return res.status(400).json({
-    error: "Please provide valid cart items.",
-  });
-}
+    // Validate customer information
+    const name =
+      typeof customerName === "string" ? customerName.trim() : "";
+    const email =
+      typeof customerEmail === "string"
+        ? customerEmail.trim().toLowerCase()
+        : "";
+    const phone =
+      typeof customerPhone === "string" ? customerPhone.trim() : "";
+    const address =
+      typeof customerAddress === "string" ? customerAddress.trim() : "";
+
+    if (
+      name.length < 2 ||
+      name.length > 120 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      email.length > 254 ||
+      phone.length < 5 ||
+      phone.length > 40 ||
+      address.length < 5 ||
+      address.length > 500
+    ) {
+      return res.status(400).json({
+        error: "Please enter a valid name, email, phone number, and delivery address.",
+      });
+    }
+
+    // Validate cart
+    if (!Array.isArray(items) || items.length === 0 || items.length > 50) {
+      return res.status(400).json({
+        error: "Please provide valid cart items.",
+      });
+    }
 
     const quantities = new Map();
 
@@ -101,27 +131,36 @@ if (
       });
     }
 
+    // Save customer details and order in Neon
     orderId = randomUUID();
 
     await db.insert(orders).values({
-    id: orderId,
-    customerEmail: "",
-    items: orderItems,
-    amountCents,
-    currency,
-    paymentStatus: "pending",
-    orderStatus: "pending",
+      id: orderId,
+      customerName: name,
+      customerEmail: email,
+      customerPhone: phone,
+      customerAddress: address,
+      items: orderItems,
+      amountCents,
+      currency,
+      paymentStatus: "pending",
+      orderStatus: "pending",
     });
 
     const clientUrl = (
       process.env.CLIENT_URL || "http://localhost:5173"
     ).replace(/\/+$/, "");
 
+    // Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        customer_creation: "always",
-        client_reference_id: orderId,
-        metadata: { type: "product_order", orderId },
+      mode: "payment",
+      customer_creation: "always",
+      customer_email: email,
+      client_reference_id: orderId,
+      metadata: {
+        type: "product_order",
+        orderId,
+      },
       line_items: orderItems.map((item) => ({
         price_data: {
           currency,
@@ -133,7 +172,7 @@ if (
         quantity: item.quantity,
       })),
       success_url:
-        `${clientUrl}/shop-success?order_id=${orderId}` +
+        `${clientUrl}/shop-success?order_id=${encodeURIComponent(orderId)}` +
         `&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${clientUrl}/shop?checkout=cancelled`,
     });

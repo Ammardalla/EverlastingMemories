@@ -12,6 +12,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Shopping from "./components/Shopping";
 import Shop from "./components/Shop";
+import ShopSuccess from "./components/ShopSuccess";
 
 function HomePage() {
   return (
@@ -35,6 +36,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/shop-success" element={<ShopSuccess />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/booking-success" element={<BookingSuccess />} />

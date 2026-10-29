@@ -21,7 +21,11 @@ function Shop() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
-  // Fetch products and current display prices from Express
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -30,10 +34,9 @@ function Shop() {
         setLoadingProducts(true);
         setProductsError("");
 
-        const response = await fetch(
-          `${API_BASE_URL}/api/products`,
-          { signal: controller.signal }
-        );
+        const response = await fetch(`${API_BASE_URL}/api/products`, {
+          signal: controller.signal,
+        });
 
         if (!response.ok) {
           throw new Error("Could not load products.");
@@ -49,9 +52,7 @@ function Shop() {
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Failed to load products:", error);
-          setProductsError(
-            "Unable to load products. Please try again."
-          );
+          setProductsError("Unable to load products. Please try again.");
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -61,7 +62,6 @@ function Shop() {
     }
 
     loadProducts();
-
     return () => controller.abort();
   }, []);
 
@@ -125,65 +125,88 @@ function Shop() {
     (total, item) => total + item.price * item.quantity,
     0
   );
-  const handleCheckout = async () => {
-  if (cart.length === 0 || checkoutLoading) return;
 
-  try {
-    setCheckoutLoading(true);
-    setCheckoutError("");
+  const handleCheckout = async (event) => {
+    event.preventDefault();
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/products/checkout`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: cart.map((item) => ({
-            id: item.id,
-            quantity: item.quantity,
-          })),
-        }),
-      }
-    );
+    if (cart.length === 0 || checkoutLoading) return;
 
-    const data = await response.json();
+    const name = customerName.trim();
+    const email = customerEmail.trim();
+    const phone = customerPhone.trim();
+    const address = customerAddress.trim();
 
-    if (!response.ok) {
-      throw new Error(
-        data.error || "Unable to start checkout. Please try again."
+    if (
+      name.length < 2 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      phone.length < 5 ||
+      address.length < 5
+    ) {
+      setCheckoutError(
+        "Please enter your full name, a valid email, phone number, and delivery address."
       );
+      return;
     }
 
-    if (!data.checkoutUrl) {
-      throw new Error("Stripe checkout URL was not returned.");
-    }
+    try {
+      setCheckoutLoading(true);
+      setCheckoutError("");
 
-    window.location.href = data.checkoutUrl;
-  } catch (error) {
-    console.error("Checkout error:", error);
-    setCheckoutError(
-      error.message || "Something went wrong. Please try again."
-    );
-    setCheckoutLoading(false);
-  }
-};
+      const response = await fetch(
+        `${API_BASE_URL}/api/products/checkout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            items: cart.map((item) => ({
+              id: item.id,
+              quantity: item.quantity,
+            })),
+            customerName: name,
+            customerEmail: email,
+            customerPhone: phone,
+            customerAddress: address,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Unable to start checkout. Please try again."
+        );
+      }
+
+      if (!data.checkoutUrl) {
+        throw new Error("Stripe checkout URL was not returned.");
+      }
+
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      setCheckoutError(
+        error.message || "Something went wrong. Please try again."
+      );
+      setCheckoutLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[var(--color-black)] text-[var(--color-white)]">
-    <div className="px-[8%] pt-6">
-      <Link
-        to="/"
-        className="inline-flex items-center gap-2 text-sm text-[var(--color-taupe)] transition-colors hover:text-[var(--color-gold)]"
-      >
-        <span aria-hidden="true">←</span>
-        Back to Home
-      </Link>
-    </div>
+      <div className="px-[8%] pt-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-[var(--color-taupe)] transition-colors hover:text-[var(--color-gold)]"
+        >
+          <span aria-hidden="true">←</span>
+          Back to Home
+        </Link>
+      </div>
 
       <main>
-        {/* Shop Introduction */}
         <section className="px-[8%] pb-12 pt-20 text-center sm:pb-16 sm:pt-28">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-[var(--color-gold)]">
             The Everlasting Collection
@@ -204,7 +227,6 @@ function Shop() {
           <div className="mx-auto mt-8 h-px w-20 bg-[var(--color-gold)]" />
         </section>
 
-        {/* Categories and Filters */}
         <section className="px-[8%] pb-10">
           <div className="flex flex-col gap-6 border-b border-[rgba(168,149,132,0.25)] pb-8 lg:flex-row lg:items-center lg:justify-between">
             <div
@@ -270,56 +292,49 @@ function Shop() {
           </div>
         </section>
 
-        {/* Product Grid */}
         <section className="px-[8%] pb-24">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
-
-{loadingProducts ? (
-  <p className="col-span-full py-20 text-center text-[var(--color-taupe)]">
-    Loading products...
-  </p>
-) : productsError ? (
-  <div className="col-span-full py-20 text-center">
-    <p className="text-red-400">{productsError}</p>
-    <button
-      type="button"
-      onClick={() => window.location.reload()}
-      className="mt-4 border border-[var(--color-gold)] px-5 py-3 text-sm text-[var(--color-gold)]"
-    >
-      Try Again
-    </button>
-  </div>
-) : (
-  filteredProducts.map((product) => (
-    <ProductCard
-      key={product.id}
-      product={product}
-      onAddToCart={addToCart}
-    />
-  ))
-)}
-
+            {loadingProducts ? (
+              <p className="col-span-full py-20 text-center text-[var(--color-taupe)]">
+                Loading products...
+              </p>
+            ) : productsError ? (
+              <div className="col-span-full py-20 text-center">
+                <p className="text-red-400">{productsError}</p>
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="mt-4 border border-[var(--color-gold)] px-5 py-3 text-sm text-[var(--color-gold)]"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <p className="col-span-full py-20 text-center text-[var(--color-taupe)]">
+                No products found in this category.
+              </p>
+            ) : (
+              filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={addToCart}
+                />
+              ))
+            )}
           </div>
-
-          {filteredProducts.length === 0 && (
-            <p className="py-20 text-center text-[var(--color-taupe)]">
-              No products found in this category.
-            </p>
-          )}
         </section>
       </main>
 
-  {/* Footer Bottom */}
-  <div className="flex flex-col my-2 items-start justify-between gap-2 border-t border-[rgba(168,149,132,0.2)] pt-6 min-[600px]:flex-row min-[600px]:items-center">
-    <p className="m-2 text-[0.7rem] tracking-[0.03em] text-[var(--color-taupe)]">
-      © 2026 Everlasting Memories. All rights reserved.
-    </p>
+      <div className="my-2 flex flex-col items-start justify-between gap-2 border-t border-[rgba(168,149,132,0.2)] pt-6 min-[600px]:flex-row min-[600px]:items-center">
+        <p className="m-2 text-[0.7rem] tracking-[0.03em] text-[var(--color-taupe)]">
+          © 2026 Everlasting Memories. All rights reserved.
+        </p>
+        <p className="m-2 text-[0.7rem] tracking-[0.03em] text-[var(--color-taupe)]">
+          Photography &amp; Visual Stories
+        </p>
+      </div>
 
-    <p className="m-2 text-[0.7rem] tracking-[0.03em] text-[var(--color-taupe)]">
-      Photography &amp; Visual Stories
-    </p>
-  </div>
-      {/* Shopping Cart Drawer */}
       {cartOpen && (
         <div
           className="fixed inset-0 z-50 flex justify-end bg-black/70"
@@ -392,11 +407,9 @@ function Shop() {
                           >
                             −
                           </button>
-
                           <span className="text-sm tabular-nums">
                             {item.quantity}
                           </span>
-
                           <button
                             type="button"
                             onClick={() => updateCartQuantity(item.id, 1)}
@@ -415,7 +428,7 @@ function Shop() {
                   ))}
                 </div>
 
-                <div className="border-t border-[rgba(168,149,132,0.3)] pt-5">
+                <form onSubmit={handleCheckout} className="border-t border-[rgba(168,149,132,0.3)] pt-5">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--color-taupe)]">
                       Subtotal
@@ -428,6 +441,88 @@ function Shop() {
                   <p className="mt-3 text-xs leading-5 text-[var(--color-taupe)]">
                     Shipping and any applicable taxes are calculated separately.
                   </p>
+
+                  <div className="mt-5 space-y-4">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--color-gold)]">
+                      Delivery Information
+                    </h3>
+
+                    <div>
+                      <label htmlFor="customer-name" className="mb-1 block text-xs text-[var(--color-taupe)]">
+                        Full Name *
+                      </label>
+                      <input
+                        id="customer-name"
+                        name="customerName"
+                        type="text"
+                        autoComplete="name"
+                        required
+                        minLength={2}
+                        maxLength={120}
+                        value={customerName}
+                        onChange={(event) => setCustomerName(event.target.value)}
+                        placeholder="Your full name"
+                        className="w-full border border-[rgba(168,149,132,0.35)] bg-transparent px-3 py-3 text-sm outline-none focus:border-[var(--color-gold)]"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="customer-email" className="mb-1 block text-xs text-[var(--color-taupe)]">
+                        Email Address *
+                      </label>
+                      <input
+                        id="customer-email"
+                        name="customerEmail"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        maxLength={254}
+                        value={customerEmail}
+                        onChange={(event) => setCustomerEmail(event.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full border border-[rgba(168,149,132,0.35)] bg-transparent px-3 py-3 text-sm outline-none focus:border-[var(--color-gold)]"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="customer-phone" className="mb-1 block text-xs text-[var(--color-taupe)]">
+                        Phone Number *
+                      </label>
+                      <input
+                        id="customer-phone"
+                        name="customerPhone"
+                        type="tel"
+                        autoComplete="tel"
+                        required
+                        minLength={5}
+                        maxLength={40}
+                        value={customerPhone}
+                        onChange={(event) => setCustomerPhone(event.target.value)}
+                        placeholder="+961 ..."
+                        className="w-full border border-[rgba(168,149,132,0.35)] bg-transparent px-3 py-3 text-sm outline-none focus:border-[var(--color-gold)]"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="customer-address" className="mb-1 block text-xs text-[var(--color-taupe)]">
+                        Delivery Address *
+                      </label>
+                      <textarea
+                        id="customer-address"
+                        name="customerAddress"
+                        autoComplete="street-address"
+                        required
+                        minLength={5}
+                        maxLength={500}
+                        rows={3}
+                        value={customerAddress}
+                        onChange={(event) => setCustomerAddress(event.target.value)}
+                        placeholder="Street, building, area, city..."
+                        className="w-full resize-y border border-[rgba(168,149,132,0.35)] bg-transparent px-3 py-3 text-sm outline-none focus:border-[var(--color-gold)]"
+                      />
+                    </div>
+                  </div>
+
                   {checkoutError && (
                     <p role="alert" className="mt-4 text-sm text-red-400">
                       {checkoutError}
@@ -435,14 +530,13 @@ function Shop() {
                   )}
 
                   <button
-                    type="button"
-                    onClick={handleCheckout}
+                    type="submit"
                     disabled={checkoutLoading || cart.length === 0}
                     className="mt-6 w-full border border-[var(--color-gold)] px-6 py-4 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-gold)] transition-colors hover:bg-[var(--color-gold)] hover:text-[var(--color-black)] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {checkoutLoading ? "Redirecting to Checkout..." : "Proceed to Checkout"}
                   </button>
-                </div>
+                </form>
               </>
             )}
           </aside>

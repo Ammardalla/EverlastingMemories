@@ -157,16 +157,31 @@ export const bookings = pgTable("bookings", {
 });
 
 
+
 export const orders = pgTable("orders", {
   id: text("id").primaryKey(),
+
+  customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email").notNull(),
+  customerPhone: text("customer_phone").notNull(),
+  customerAddress: text("customer_address").notNull(),
+
   items: jsonb("items").notNull(),
   amountCents: integer("amount_cents").notNull(),
   currency: text("currency").notNull().default("usd"),
-  paymentStatus: text("payment_status").notNull().default("pending"),
-  orderStatus: text("order_status").notNull().default("pending"),
+
+  paymentStatus: text("payment_status")
+    .notNull()
+    .default("pending"),
+
+  orderStatus: text("order_status")
+    .notNull()
+    .default("pending"),
+
   stripeCheckoutSessionId: text("stripe_checkout_session_id"),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
+
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
