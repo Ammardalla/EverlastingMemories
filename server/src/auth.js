@@ -31,9 +31,10 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
   },
 
-  trustedOrigins: [
-    process.env.CLIENT_URL ?? 'http://localhost:5173',
-  ],
+trustedOrigins: [
+  'https://ammardalla.github.io',
+  'http://localhost:5173',
+],
 
   advanced: {
     defaultCookieAttributes: {
