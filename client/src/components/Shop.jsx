@@ -401,11 +401,17 @@ const cartTotal = cart.reduce(
                 <div className="flex-1 divide-y divide-[rgba(168,149,132,0.2)]">
                   {cart.map((item) => (
                     <div key={item.id} className="flex gap-4 py-5">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-24 w-20 shrink-0 bg-[var(--color-espresso)] object-cover"
-                      />
+<img
+  src={
+    /^https?:\/\//i.test(item.image || "")
+      ? item.image
+      : `${import.meta.env.BASE_URL}${(item.image || "")
+          .replace(/^\/+/, "")
+          .replace(/^EverlastingMemories\//, "")}`
+  }
+  alt={item.name}
+  className="h-24 w-20 shrink-0 bg-[var(--color-espresso)] object-cover"
+/>
 
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-medium">{item.name}</h3>
