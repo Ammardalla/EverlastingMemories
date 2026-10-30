@@ -165,9 +165,9 @@ function Gallery() {
                   : getGalleryClasses('large')
               }`}
             >
-              <img
-                src={`${import.meta.env.BASE_URL}${item.imageUrl}`}
-                alt={item.alt}
+<img
+  src={`${import.meta.env.BASE_URL}${item.imageUrl.replace(/^\/+/, '')}`}
+  alt={item.alt}
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               />

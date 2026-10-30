@@ -34,18 +34,12 @@ function HomePage() {
 const redirectPath = new URLSearchParams(window.location.search).get("p");
 
 if (redirectPath) {
-  const query = new URLSearchParams(window.location.search).get("q");
-
   window.history.replaceState(
     null,
     "",
-    "/EverlastingMemories" +
-      redirectPath +
-      (query ? "?" + query : "") +
-      window.location.hash
+    "/EverlastingMemories" + redirectPath + window.location.hash
   );
 }
-
 function App() {
   return (
     <BrowserRouter basename="/EverlastingMemories">
