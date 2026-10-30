@@ -169,35 +169,40 @@ productCheckoutRouter.post("/", async (req, res) => {
       orderStatus: "pending",
     });
 
-    const clientUrl = (
-      process.env.CLIENT_URL || "http://localhost:5173"
-    ).replace(/\/+$/, "");
+const clientUrl = (
+  process.env.CLIENT_URL || "http://localhost:5173"
+).replace(/\/+$/, "");
 
-    const stripeSession = await stripe.checkout.sessions.create({
-      mode: "payment",
-      customer_creation: "always",
-      customer_email: email,
-      client_reference_id: orderId,
-      metadata: {
-        type: "product_order",
-        orderId,
-        discountPercent: String(isLoggedIn ? DISCOUNT_PERCENT : 0),
+const frontendBasePath =
+  clientUrl === "https://ammardalla.github.io"
+    ? "/EverlastingMemories"
+    : "";
+
+const stripeSession = await stripe.checkout.sessions.create({
+  mode: "payment",
+  customer_creation: "always",
+  customer_email: email,
+  client_reference_id: orderId,
+  metadata: {
+    type: "product_order",
+    orderId,
+    discountPercent: String(isLoggedIn ? DISCOUNT_PERCENT : 0),
+  },
+  line_items: orderItems.map((item) => ({
+    price_data: {
+      currency,
+      unit_amount: item.unitAmountCents,
+      product_data: {
+        name: item.name,
       },
-      line_items: orderItems.map((item) => ({
-        price_data: {
-          currency,
-          unit_amount: item.unitAmountCents,
-          product_data: {
-            name: item.name,
-          },
-        },
-        quantity: item.quantity,
-      })),
-      success_url:
-        `${clientUrl}/shop-success?order_id=${encodeURIComponent(orderId)}` +
-        `&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${clientUrl}/shop?checkout=cancelled`,
-    });
+    },
+    quantity: item.quantity,
+  })),
+  success_url:
+    `${clientUrl}${frontendBasePath}/shop-success?order_id=${encodeURIComponent(orderId)}` +
+    `&session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url: `${clientUrl}${frontendBasePath}/shop?checkout=cancelled`,
+});
 
     await db
       .update(orders)

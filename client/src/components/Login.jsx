@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { authClient } from "../lib/auth-client";
+import { Link, useNavigate } from "react-router-dom";
+import { authClient } from "../lib/auth-client";import { authClient } from "../lib/auth-client";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -27,7 +29,7 @@ export default function Login() {
         return;
       }
 
-      window.location.href = "/";
+navigate("/");
     } catch {
       setError(
         "Unable to connect to the server. Please try again."
@@ -41,19 +43,19 @@ export default function Login() {
     <main className="min-h-screen bg-[#f8f4ee] px-4 py-6 text-[#503a32] sm:px-8">
       {/* Header */}
       <header className="mx-auto mb-8 flex max-w-7xl items-center justify-between">
-        <a href="/" className="flex items-center gap-3">
+<Link to="/" className="flex items-center gap-3">
           <span className="text-2xl text-[#c9653b]">◎</span>
           <span className="font-serif text-xxl leading-tight sm:text-xl">
             Everlasting Memories
           </span>
-        </a>
+        </Link>
 
-        <a
-          href="/"
-          className="rounded-full bg-[#c9653b] px-5 py-2.5 text-sm text-white transition hover:bg-[#a94e2c]"
-        >
-          Home
-        </a>
+<Link
+  to="/"
+  className="rounded-full bg-[#c9653b] px-5 py-2.5 text-sm text-white transition hover:bg-[#a94e2c]"
+>
+  Home
+</Link>
       </header>
 
       {/* Login Card */}
@@ -161,12 +163,12 @@ export default function Login() {
 
             <p className="text-center text-sm text-[#8b756a]">
               Don’t have an account?{" "}
-              <a
-                href="/signup"
-                className="font-semibold text-[#c9653b] hover:underline"
-              >
-                Sign Up
-              </a>
+<Link
+  to="/signup"
+  className="font-semibold text-[#c9653b] hover:underline"
+>
+  Sign Up
+</Link>
             </p>
           </div>
         </div>
@@ -174,7 +176,7 @@ export default function Login() {
         {/* Photography panel */}
         <div className="relative hidden min-h-[690px] lg:block">
           <img
-            src="/images/img1.jpg"
+            src={`${import.meta.env.BASE_URL}images/img1.jpg`}
             alt="A beautiful photography moment"
             className="absolute inset-0 h-full w-full object-cover"
           />

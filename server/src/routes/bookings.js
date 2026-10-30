@@ -117,46 +117,53 @@ bookingsRouter.post("/checkout", async (req, res) => {
       });
     }
 
-    const clientUrl = (
-      process.env.CLIENT_URL || "http://localhost:5173"
-    ).replace(/\/+$/, "");
+   
+const clientUrl = (
+  process.env.CLIENT_URL || "http://localhost:5173"
+).replace(/\/+$/, "");
 
-    const stripeSession = await stripe.checkout.sessions.create({
-      mode: "payment",
-      customer_email: email.trim(),
-      client_reference_id: bookingId,
-      metadata: {
-        bookingId,
-        packageId,
-        discountPercent: String(discountPercent),
-        originalAmountCents: String(originalAmountCents),
-        amountCents: String(amountCents),
-      },
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            unit_amount: amountCents,
-            product_data: {
-              name: `${selectedPackage.label} Photography Package`,
-              description: `${selectedPackage.photos} edited photos${
-                discountPercent
-                  ? ` (${discountPercent}% member discount)`
-                  : ""
-              }`,
-            },
-          },
-          quantity: 1,
+const frontendBasePath =
+  clientUrl === "https://ammardalla.github.io"
+    ? "/EverlastingMemories"
+    : "";
+
+const stripeSession = await stripe.checkout.sessions.create({
+  mode: "payment",
+  customer_email: email.trim(),
+  client_reference_id: bookingId,
+  metadata: {
+    bookingId,
+    packageId,
+    discountPercent: String(discountPercent),
+    originalAmountCents: String(originalAmountCents),
+    amountCents: String(amountCents),
+  },
+  line_items: [
+    {
+      price_data: {
+        currency: "usd",
+        unit_amount: amountCents,
+        product_data: {
+          name: `${selectedPackage.label} Photography Package`,
+          description: `${selectedPackage.photos} edited photos${
+            discountPercent
+              ? ` (${discountPercent}% member discount)`
+              : ""
+          }`,
         },
-      ],
-      success_url:
-        `${clientUrl}/booking-success` +
-        `?booking_id=${encodeURIComponent(bookingId)}` +
-        `&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:
-        `${clientUrl}/booking-cancelled` +
-        `?booking_id=${encodeURIComponent(bookingId)}`,
-    });
+      },
+      quantity: 1,
+    },
+  ],
+  success_url:
+    `${clientUrl}${frontendBasePath}/booking-success` +
+    `?booking_id=${encodeURIComponent(bookingId)}` +
+    `&session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url:
+    `${clientUrl}${frontendBasePath}/booking-cancelled` +
+    `?booking_id=${encodeURIComponent(bookingId)}`,
+});
+
 
     await db
       .update(bookings)
