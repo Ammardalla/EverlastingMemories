@@ -1,4 +1,6 @@
+
 import { useState } from "react";
+
 const DISCOUNT_PERCENT = 10;
 
 function ProductCard({ product, onAddToCart, isLoggedIn = false }) {
@@ -13,6 +15,16 @@ function ProductCard({ product, onAddToCart, isLoggedIn = false }) {
   const discountedPrice = discountedCents / 100;
   const displayPrice = isLoggedIn ? discountedPrice : originalPrice;
 
+  // Build the correct image URL for GitHub Pages
+  const imagePath = (product.image || "").replace(/^\/+/, "");
+
+  const imageUrl = /^https?:\/\//i.test(imagePath)
+    ? imagePath
+    : `${import.meta.env.BASE_URL}${imagePath.replace(
+        /^EverlastingMemories\//,
+        ""
+      )}`;
+
   const decreaseQuantity = () => {
     setQuantity((current) => Math.max(1, current - 1));
   };
@@ -25,7 +37,7 @@ function ProductCard({ product, onAddToCart, isLoggedIn = false }) {
     <article className="group flex h-full flex-col overflow-hidden border border-[rgba(168,149,132,0.25)] bg-[var(--color-black)] text-[var(--color-white)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-gold)]">
       <div className="relative aspect-[4/5] overflow-hidden bg-[var(--color-espresso)]">
         <img
-          src={product.image}
+          src={imageUrl}
           alt={product.name}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
