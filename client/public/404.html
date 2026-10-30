@@ -5,23 +5,20 @@
     <meta charset="utf-8">
     <title>Everlasting Memories</title>
     <script>
-      const segmentCount = 1;
-      const location = window.location;
-      const path = location.pathname
-        .split("/")
-        .slice(segmentCount + 1)
-        .join("/");
+      const basePath = "/EverlastingMemories";
+      const currentLocation = window.location;
 
-      const query = location.search;
-      const hash = location.hash;
+      const path = currentLocation.pathname.startsWith(basePath)
+        ? currentLocation.pathname.slice(basePath.length)
+        : currentLocation.pathname;
 
-      location.replace(
-        location.origin +
-        "/EverlastingMemories/" +
-        "?p=/" + path.replace(/&/g, "~and~") +
-        (query ? "&q=" + encodeURIComponent(query.slice(1)) : "") +
-        hash
-      );
+      const redirectUrl =
+        basePath +
+        "/?p=" +
+        encodeURIComponent(path + currentLocation.search) +
+        currentLocation.hash;
+
+      window.location.replace(redirectUrl);
     </script>
   </head>
   <body>

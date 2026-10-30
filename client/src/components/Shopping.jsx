@@ -1,5 +1,6 @@
 
 import React from 'react'
+import { Link } from "react-router-dom";
 
 function Shopping() {
   return (
@@ -26,15 +27,15 @@ function Shopping() {
           keepsakes made to bring your favorite moments to life.
         </p>
 
-        <a
-          href="/shop"
-          className="group inline-flex items-center gap-4 border border-[var(--color-gold)] px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-gold)] transition-all duration-300 hover:bg-[var(--color-gold)] hover:text-[var(--color-black)]"
-        >
-          Shop Now
-          <span className="transition-transform duration-300 group-hover:translate-x-1">
-            →
-          </span>
-        </a>
+<Link
+  to="/shop"
+  className="group inline-flex items-center gap-4 border border-[var(--color-gold)] px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-gold)] transition-all duration-300 hover:bg-[var(--color-gold)] hover:text-[var(--color-black)]"
+>
+  Shop Now
+  <span className="transition-transform duration-300 group-hover:translate-x-1">
+    →
+  </span>
+</Link>
 
         {/* Shopping Highlights */}
         <div className="mt-12 grid grid-cols-3 gap-4 border-t border-[rgba(168,149,132,0.3)] pt-7">
