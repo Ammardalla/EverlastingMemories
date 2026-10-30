@@ -9,6 +9,7 @@ import { productsRouter } from "./routes/products.js";
 import { bookingsRouter } from "./routes/bookings.js";
 import { stripeWebhookRouter } from "./routes/stripeWebhook.js";
 import { productCheckoutRouter } from "./routes/productCheckout.js";
+import { adminRouter } from "./routes/admin.js";
 
 if (!globalThis.crypto) {
   globalThis.crypto = webcrypto;
@@ -28,6 +29,52 @@ if (!globalThis.crypto) {
   app.all("/api/auth/{*any}", toNodeHandler(auth));
 
   app.use(express.json());
+  app.use("/api/admin", adminRouter);
+  
+app.get("/api/admin/check", async (req, res) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: req.headers,
+    });
+
+    if (!session) {
+      return res.status(401).json({
+        success: false,
+        message: "you must sign-in first",
+      });
+    }
+
+    const adminUserId = process.env.ADMIN_USER_ID;
+
+    if (
+      !adminUserId ||
+      session.user.id !== adminUserId
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "you don't have access",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Admin checked successful",
+      user: {
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Admin check error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Admin check error",
+    });
+  }
+});
+
 
   app.use("/api/gallery", galleryRouter);
   app.use("/api/products", productsRouter);
